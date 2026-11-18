@@ -1,0 +1,3643 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tučňáčí rezervace – Farma, Morálka &amp; Obrana</title>
+    <style>
+        :root {
+            --bg-top: #061529;
+            --bg-mid: #0d3258;
+            --bg-bot: #114776;
+            --panel-bg: rgba(13, 22, 40, 0.94);
+            --card-bg: rgba(28, 40, 62, 0.88);
+            --border-soft: rgba(56, 189, 248, 0.26);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent-sky: #38bdf8;
+            --accent-gold: #fbbf24;
+            --accent-emerald: #34d399;
+            --accent-rose: #fb7185;
+            --accent-purple: #c084fc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 55%, var(--bg-bot) 100%);
+            color: var(--text-main);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* HORNÍ LIŠTA */
+        header {
+            background: rgba(9, 16, 31, 0.92);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-soft);
+            padding: 7px 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            z-index: 20;
+            flex-shrink: 0;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #38bdf8, #2563eb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            flex-shrink: 0;
+        }
+
+        .brand-title-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brand h1 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #e0f2fe;
+            line-height: 1.15;
+        }
+
+        .mode-badge {
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: rgba(56, 189, 248, 0.2);
+            color: #7dd3fc;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+        }
+
+        .mode-badge.ng2 {
+            background: linear-gradient(90deg, rgba(168, 85, 247, 0.35), rgba(236, 72, 153, 0.35));
+            color: #f5d0fe;
+            border-color: rgba(217, 70, 239, 0.65);
+        }
+
+        .brand p {
+            font-size: 0.7rem;
+            color: rgba(148, 163, 184, 0.9);
+        }
+
+        .stats-bar {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .stat-pill {
+            background: rgba(28, 40, 62, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 12px;
+            padding: 4px 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-pill.gold { border-color: rgba(251, 191, 36, 0.45); }
+        .stat-pill.sky { border-color: rgba(56, 189, 248, 0.35); }
+        .stat-pill.pink { border-color: rgba(244, 114, 182, 0.45); }
+        .stat-pill.emerald { border-color: rgba(52, 211, 153, 0.35); }
+        .stat-pill.rose { border-color: rgba(251, 113, 133, 0.35); }
+
+        .stat-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-value {
+            font-size: 0.9rem;
+            font-weight: 800;
+            line-height: 1.15;
+        }
+
+        .stat-pill.gold .stat-value { color: #fcd34d; }
+        .stat-pill.pink .stat-value { color: #f9a8d4; }
+        .stat-pill.emerald .stat-value { color: #6ee7b7; }
+        .stat-pill.rose .stat-value { color: #fecdd3; }
+
+        .sys-buttons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.1s ease, filter 0.15s ease, background 0.15s ease;
+        }
+
+        button:active:not(:disabled) {
+            transform: scale(0.96);
+        }
+
+        .btn-sys {
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #f8fafc;
+            background: #1e293b;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .btn-sys:hover { filter: brightness(1.15); }
+        .btn-sys.save { background: #0369a1; border-color: rgba(56, 189, 248, 0.4); }
+        .btn-sys.ng2-btn {
+            background: linear-gradient(135deg, #4c1d95, #86198f);
+            border-color: rgba(232, 121, 249, 0.5);
+            color: #fae8ff;
+        }
+        .btn-sys.ng2-btn.unlocked {
+            background: linear-gradient(135deg, #9333ea, #db2777);
+            box-shadow: 0 0 12px rgba(217, 70, 239, 0.45);
+        }
+
+        /* HLAVNÍ ROZVRŽENÍ */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .canvas-section {
+            flex: 1;
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            cursor: pointer;
+        }
+
+        /* BANNER NÁJEZDU LOVCŮ */
+        @keyframes pulseAlert {
+            0%, 100% { transform: translateX(-50%) scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            50% { transform: translateX(-50%) scale(1.03); box-shadow: 0 0 20px 4px rgba(239, 68, 68, 0.5); }
+        }
+
+        .raid-banner {
+            display: none;
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            background: linear-gradient(90deg, #b91c1c, #e11d48, #b91c1c);
+            color: #fff;
+            padding: 7px 15px;
+            border-radius: 14px;
+            border: 2px solid #fde047;
+            font-size: 0.8rem;
+            font-weight: 800;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            animation: pulseAlert 1.2s infinite;
+            white-space: nowrap;
+        }
+
+        .raid-banner.visible {
+            display: flex;
+        }
+
+        /* TOAST NOTIFIKACE */
+        .toast {
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            pointer-events: none;
+            position: absolute;
+            top: 52px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 16;
+            background: rgba(15, 23, 42, 0.95);
+            color: #e0f2fe;
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+            white-space: nowrap;
+            max-width: 92%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* SPODNÍ RYCHLÉ AKCE NA KŘE */
+        .canvas-hud-bottom {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .quick-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: auto;
+        }
+
+        .btn-action {
+            padding: 9px 14px;
+            border-radius: 13px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .btn-action.fish {
+            background: linear-gradient(135deg, #06b6d4, #2563eb);
+        }
+
+        .btn-action.warm {
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+        }
+
+        .coin-legend {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            background: rgba(15, 23, 42, 0.84);
+            backdrop-filter: blur(6px);
+            padding: 7px 12px;
+            border-radius: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            font-size: 0.72rem;
+            color: #e2e8f0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* PRAVÝ PANEL OBCHODU */
+        aside.shop-panel {
+            width: 410px;
+            max-width: 100%;
+            height: 100%;
+            background: var(--panel-bg);
+            border-left: 1px solid var(--border-soft);
+            display: flex;
+            flex-direction: column;
+            z-index: 12;
+            flex-shrink: 0;
+        }
+
+        .shop-tabs {
+            padding: 9px;
+            background: rgba(7, 13, 26, 0.8);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.18);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .shop-tab {
+            padding: 7px 4px;
+            border-radius: 11px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: rgba(30, 41, 59, 0.85);
+            color: #bae6fd;
+            border: 1px solid transparent;
+        }
+
+        .shop-tab:hover {
+            background: rgba(51, 65, 85, 0.9);
+        }
+
+        .shop-tab.active {
+            background: #0284c7;
+            color: #ffffff;
+            border-color: rgba(125, 211, 252, 0.5);
+            box-shadow: 0 2px 10px rgba(2, 132, 199, 0.45);
+        }
+
+        .shop-tab span.tab-icon {
+            font-size: 1rem;
+        }
+
+        .shop-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .shop-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .shop-list::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.4);
+        }
+        .shop-list::-webkit-scrollbar-thumb {
+            background: rgba(125, 211, 252, 0.35);
+            border-radius: 999px;
+        }
+
+        .shop-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(56, 189, 248, 0.22);
+            border-radius: 15px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 9px;
+        }
+
+        .shop-card.maxed {
+            background: rgba(16, 44, 38, 0.72);
+            border-color: rgba(52, 211, 153, 0.5);
+        }
+
+        .shop-card-left {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            min-width: 0;
+        }
+
+        .item-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .item-info {
+            min-width: 0;
+        }
+
+        .item-header {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .item-title {
+            font-size: 0.83rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+
+        .badge-lvl {
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.63rem;
+            font-weight: 800;
+            background: rgba(14, 165, 233, 0.2);
+            color: #7dd3fc;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+
+        .badge-lvl.max {
+            background: rgba(16, 185, 129, 0.24);
+            color: #6ee7b7;
+            border-color: rgba(52, 211, 153, 0.5);
+        }
+
+        .item-desc {
+            font-size: 0.71rem;
+            color: #cbd5e1;
+            line-height: 1.32;
+            margin-top: 3px;
+        }
+
+        .shop-card.maxed .item-desc {
+            color: #a7f3d0;
+            font-weight: 600;
+        }
+
+        .btn-buy {
+            padding: 8px 10px;
+            border-radius: 11px;
+            font-weight: 800;
+            font-size: 0.74rem;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #f59e0b, #eab308);
+            color: #0f172a;
+            box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
+            white-space: nowrap;
+        }
+
+        .btn-buy:disabled {
+            background: rgba(51, 65, 85, 0.75);
+            color: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .btn-buy.maxed-btn {
+            background: rgba(6, 78, 59, 0.85);
+            color: #a7f3d0;
+            border: 1px solid rgba(52, 211, 153, 0.5);
+            cursor: default;
+        }
+
+        /* MODÁLNÍ OKNO PRO REŽIMY / RESET */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.84);
+            backdrop-filter: blur(5px);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #0f172a;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 22px;
+            max-width: 420px;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 22px 50px rgba(0, 0, 0, 0.65);
+        }
+
+        .modal-box h2 {
+            font-size: 1.18rem;
+            margin: 6px 0 8px;
+            color: #fff;
+        }
+
+        .progress-box {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 14px;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            text-align: left;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: #e2e8f0;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 10px;
+            background: #090d16;
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #a855f7, #ec4899, #fbbf24);
+            transition: width 0.3s ease;
+        }
+
+        .mode-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .mode-choice {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 14px;
+            padding: 11px 12px;
+            text-align: left;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .mode-choice.ng2-card {
+            border-color: rgba(217, 70, 239, 0.45);
+            background: linear-gradient(135deg, rgba(46, 16, 101, 0.75), rgba(112, 26, 117, 0.65));
+        }
+
+        .mode-choice:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .mode-choice h3 {
+            font-size: 0.88rem;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .mode-choice p {
+            font-size: 0.72rem;
+            color: #cbd5e1;
+            line-height: 1.3;
+        }
+
+        .btn-cancel {
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.84rem;
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        /* RESPONZIVITA PRO MOBIL A TABLET */
+        @media (max-width: 980px) {
+            main {
+                flex-direction: column;
+            }
+            .canvas-section {
+                height: 54%;
+                flex: none;
+            }
+            aside.shop-panel {
+                width: 100%;
+                height: 46%;
+                border-left: none;
+                border-top: 1px solid var(--border-soft);
+            }
+            .brand p, .hide-mobile {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HORNÍ LIŠTA -->
+    <header>
+        <div class="brand">
+            <div class="brand-icon">🐧</div>
+            <div>
+                <div class="brand-title-row">
+                    <h1>Tučňáčí rezervace</h1>
+                    <span id="ui-mode-badge" class="mode-badge">NG1</span>
+                </div>
+                <p>Krm tučňáky, sbírej mince, zvyšuj morálku a braň kru!</p>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-pill gold">
+                <span>🪙</span>
+                <div>
+                    <div class="stat-label">Pokladna</div>
+                    <div id="ui-coins" class="stat-value">40</div>
+                </div>
+            </div>
+
+            <div class="stat-pill sky">
+                <span>🐧</span>
+                <div>
+                    <div class="stat-label">Kolonie</div>
+                    <div class="stat-value"><span id="ui-penguins">2</span><span style="font-size:0.74rem;opacity:0.75;font-weight:600;">/<span id="ui-max-penguins">6</span></span></div>
+                </div>
+            </div>
+
+            <div class="stat-pill pink">
+                <span>💖</span>
+                <div>
+                    <div class="stat-label">Morálka</div>
+                    <div id="ui-morale" class="stat-value">100%</div>
+                </div>
+            </div>
+
+            <div class="stat-pill emerald hide-mobile">
+                <span>🏆</span>
+                <div>
+                    <div class="stat-label">NG2 Postup</div>
+                    <div id="ui-ng2-progress" class="stat-value" style="font-size:0.8rem;">0 / 10 000</div>
+                </div>
+            </div>
+
+            <div class="stat-pill rose hide-mobile">
+                <span>🚤</span>
+                <div>
+                    <div class="stat-label">Hlídka</div>
+                    <div id="ui-raid-timer" class="stat-value" style="font-size:0.8rem;">Klid</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sys-buttons">
+            <button id="btn-sound" class="btn-sys" onclick="toggleSound()" title="Zapnout/vypnout zvuk">🔊</button>
+            <button class="btn-sys save" onclick="saveGame(true)" title="Uložit hru">💾 Uložit</button>
+            <button id="btn-modes" class="btn-sys ng2-btn" onclick="openModeModal()" title="Režimy New Game 1 / New Game 2 a Reset">⚡ Režim / Reset</button>
+        </div>
+    </header>
+
+    <!-- HLAVNÍ PLOCHA -->
+    <main>
+        <section class="canvas-section" id="canvas-container">
+            <canvas id="gameCanvas"></canvas>
+
+            <div id="raid-banner" class="raid-banner">
+                <span>🚨</span>
+                <span>POZOR! Připlouvají lovci! Klikej na čluny a zasyp je sněhovými koulemi!</span>
+            </div>
+
+            <div id="toast-message" class="toast">Zpráva</div>
+
+            <div class="canvas-hud-bottom">
+                <div class="quick-actions">
+                    <button class="btn-action fish" onclick="throwFishCenter()">
+                        <span>🐟</span> Hodit rybu (Zdarma)
+                    </button>
+                    <button class="btn-action warm" onclick="warmAllEggsAndPenguins()">
+                        <span>☀️</span> Zahřát
+                    </button>
+                </div>
+
+                <div class="coin-legend hide-mobile">
+                    <span class="legend-item"><span class="dot" style="background:#e2e8f0;"></span> Kroužkový: <b id="leg-silver">5 🪙</b></span>
+                    <span class="legend-item"><span class="dot" style="background:#fbbf24;"></span> Skalní: <b id="leg-gold">15 🪙</b></span>
+                    <span class="legend-item"><span class="dot" style="background:#38bdf8;"></span> Císařský: <b id="leg-diamond">40 🪙</b></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- OBCHOD -->
+        <aside class="shop-panel">
+            <div class="shop-tabs">
+                <button id="tab-penguins" class="shop-tab active" onclick="setShopTab('penguins')">
+                    <span class="tab-icon">🥚</span>
+                    <span>Tučňáci &amp; Vejce</span>
+                </button>
+                <button id="tab-collectors" class="shop-tab" onclick="setShopTab('collectors')">
+                    <span class="tab-icon">🎒</span>
+                    <span>Sběrači</span>
+                </button>
+                <button id="tab-care" class="shop-tab" onclick="setShopTab('care')">
+                    <span class="tab-icon">💖</span>
+                    <span>Péče &amp; Morálka</span>
+                </button>
+                <button id="tab-defense" class="shop-tab" onclick="setShopTab('defense')">
+                    <span class="tab-icon">🛡️</span>
+                    <span>Obrana</span>
+                </button>
+            </div>
+
+            <div id="shop-items-container" class="shop-list"></div>
+        </aside>
+    </main>
+
+    <!-- MODÁLNÍ OKNO PRO NEW GAME 1 / NEW GAME 2 / RESET -->
+    <div id="mode-modal" class="modal-backdrop">
+        <div class="modal-box">
+            <div style="font-size: 2rem;">🐧⚡❄️</div>
+            <h2>Herní režimy &amp; Nová hra</h2>
+
+            <div class="progress-box">
+                <div class="progress-header">
+                    <span>Odemčení New Game 2 (Turbo)</span>
+                    <span id="modal-ng2-text">0 / 10 000 🪙</span>
+                </div>
+                <div class="progress-track">
+                    <div id="modal-ng2-bar" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <div class="mode-cards">
+                <button class="mode-choice" onclick="startSelectedMode(1)">
+                    <div>
+                        <h3>🐧 New Game 1 (Klasický)</h3>
+                        <p>Start se 2 malými tučňáky, 1 vejcem a 40 mincemi. Vyvážené tempo rezervace.</p>
+                    </div>
+                    <span style="font-weight:800;color:#7dd3fc;font-size:0.8rem;">Spustit →</span>
+                </button>
+
+                <button id="btn-start-ng2" class="mode-choice ng2-card" onclick="startSelectedMode(2)" disabled>
+                    <div>
+                        <h3>⚡ New Game 2 (Turbo 2.2×)</h3>
+                        <p>2,2× rychlejší růst, líhnutí i pohyb + <b>+50 % hodnota všech mincí</b> a polární záře!</p>
+                    </div>
+                    <span id="badge-start-ng2" style="font-weight:800;color:#f5d0fe;font-size:0.78rem;">🔒 Zamčeno</span>
+                </button>
+            </div>
+
+            <button class="btn-cancel" onclick="closeModeModal()">Pokračovat v aktuální hře</button>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================================
+        // 1. ZVUKOVÝ SYSTÉM (Web Audio API s bezpečným ošetřením)
+        // =========================================================================
+        class SoundManager {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+            }
+
+            init() {
+                try {
+                    if (!this.ctx) {
+                        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                        if (AudioCtx) this.ctx = new AudioCtx();
+                    }
+                    if (this.ctx && this.ctx.state === 'suspended') {
+                        this.ctx.resume().catch(() => {});
+                    }
+                } catch (e) {}
+            }
+
+            playTone(freq, type = 'sine', duration = 0.14, vol = 0.09, slideFreq = null) {
+                if (this.muted) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, now);
+                    if (slideFreq && slideFreq > 0) {
+                        osc.frequency.exponentialRampToValueAtTime(slideFreq, now + duration);
+                    }
+                    gain.gain.setValueAtTime(vol, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + duration);
+                } catch (e) {}
+            }
+
+            playCoin(coinType = 'silver') {
+                if (coinType === 'diamond') {
+                    this.playTone(987.77, 'sine', 0.14, 0.11, 1318.5);
+                    setTimeout(() => this.playTone(1567.98, 'triangle', 0.20, 0.10), 65);
+                } else if (coinType === 'gold') {
+                    this.playTone(783.99, 'sine', 0.13, 0.10, 1046.5);
+                    setTimeout(() => this.playTone(1318.5, 'sine', 0.16, 0.09), 55);
+                } else {
+                    this.playTone(659.25, 'sine', 0.12, 0.10, 880);
+                }
+            }
+
+            playCoinDrop() { this.playTone(520, 'triangle', 0.09, 0.07, 720); }
+            playSplash()   { this.playTone(280, 'sine', 0.16, 0.09, 140); }
+            playHappy()    {
+                this.playTone(440, 'sine', 0.10, 0.09, 554.37);
+                setTimeout(() => this.playTone(659.25, 'sine', 0.14, 0.09), 75);
+            }
+            playHatch()    {
+                this.playTone(392, 'triangle', 0.11, 0.10);
+                setTimeout(() => this.playTone(523.25, 'triangle', 0.11, 0.10), 85);
+                setTimeout(() => this.playTone(783.99, 'triangle', 0.22, 0.12), 170);
+            }
+            playThrow()    { this.playTone(340, 'sine', 0.11, 0.08, 190); }
+            playRocket()   { this.playTone(220, 'sawtooth', 0.22, 0.08, 620); }
+            playButterBoom() { this.playTone(150, 'triangle', 0.26, 0.12, 55); }
+            playBark()     {
+                this.playTone(290, 'square', 0.07, 0.07, 210);
+                setTimeout(() => this.playTone(330, 'square', 0.08, 0.07, 230), 80);
+            }
+            playHit()      { this.playTone(165, 'square', 0.11, 0.09, 90); }
+            playAlarm()    {
+                this.playTone(420, 'sawtooth', 0.20, 0.07, 320);
+                setTimeout(() => this.playTone(420, 'sawtooth', 0.20, 0.07, 320), 250);
+            }
+            playBuy()      {
+                this.playTone(523.25, 'sine', 0.10, 0.10);
+                setTimeout(() => this.playTone(659.25, 'sine', 0.14, 0.10), 70);
+            }
+        }
+
+        const sound = new SoundManager();
+
+        function toggleSound() {
+            sound.muted = !sound.muted;
+            const btn = document.getElementById('btn-sound');
+            if (btn) btn.textContent = sound.muted ? '🔇' : '🔊';
+            if (!sound.muted) sound.playBuy();
+        }
+
+        // =========================================================================
+        // 2. KONFIGURACE DRUHŮ TUČŇÁKŮ, MINCÍ A KAPACITY KRY
+        // =========================================================================
+        const NG2_UNLOCK_COINS = 10000;
+        const ICE_CAPACITIES = [6, 10, 15, 22];
+
+        const SPECIES_CONFIG = {
+            adelie: {
+                id: 'adelie',
+                name: 'Tučňák kroužkový',
+                coinType: 'silver',
+                coinValue: 5,
+                eggPrice: 25,
+                babyPrice: 45,
+                growthNeeded: 100
+            },
+            rockhopper: {
+                id: 'rockhopper',
+                name: 'Tučňák skalní',
+                coinType: 'gold',
+                coinValue: 15,
+                eggPrice: 90,
+                babyPrice: 150,
+                growthNeeded: 140
+            },
+            emperor: {
+                id: 'emperor',
+                name: 'Tučňák císařský',
+                coinType: 'diamond',
+                coinValue: 40,
+                eggPrice: 240,
+                babyPrice: 380,
+                growthNeeded: 200
+            }
+        };
+
+        const COIN_CONFIG = {
+            silver: {
+                type: 'silver',
+                baseValue: 5,
+                colorMain: '#e2e8f0',
+                colorDark: '#94a3b8',
+                colorRim: '#ffffff',
+                glow: 'rgba(226, 232, 240, 0.7)'
+            },
+            gold: {
+                type: 'gold',
+                baseValue: 15,
+                colorMain: '#fbbf24',
+                colorDark: '#d97706',
+                colorRim: '#fef08a',
+                glow: 'rgba(251, 191, 36, 0.8)'
+            },
+            diamond: {
+                type: 'diamond',
+                baseValue: 40,
+                colorMain: '#38bdf8',
+                colorDark: '#0284c7',
+                colorRim: '#e0f2fe',
+                glow: 'rgba(56, 189, 248, 0.85)'
+            }
+        };
+
+        const PENGUIN_NAMES = [
+            'Pingu', 'Kulička', 'Flíček', 'Barnabáš', 'Sněženka', 'Alfréd',
+            'Pipin', 'Čipera', 'Břéťa', 'Olaf', 'Koblížek', 'Růženka',
+            'Vločka', 'Kapitán', 'Bublina', 'Lumi', 'Arktik', 'Šmudla'
+        ];
+
+        // =========================================================================
+        // 3. PLÁTNO A GEOMETRIE LEDOVÉ KRY
+        // =========================================================================
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let viewWidth = 800;
+        let viewHeight = 600;
+
+        function resizeCanvas() {
+            const container = document.getElementById('canvas-container');
+            const rect = container ? container.getBoundingClientRect() : { width: window.innerWidth, height: window.innerHeight * 0.55 };
+            viewWidth = Math.max(320, Math.floor(rect.width || 800));
+            viewHeight = Math.max(240, Math.floor(rect.height || 500));
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = viewWidth * dpr;
+            canvas.height = viewHeight * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function getIceGeometry() {
+            const exp = (gameState && gameState.upgrades ? gameState.upgrades.islandExpansion : 0) || 0;
+            const scaleBonus = 1 + exp * 0.095;
+            const cx = viewWidth * 0.5;
+            const cy = viewHeight * 0.52;
+            const rx = Math.min(viewWidth * 0.40, 325) * scaleBonus;
+            const ry = Math.min(viewHeight * 0.34, 210) * scaleBonus;
+            return { cx, cy, rx: Math.max(115, rx), ry: Math.max(88, ry) };
+        }
+
+        function getRandomIcePoint(margin = 28) {
+            const { cx, cy, rx, ry } = getIceGeometry();
+            const safeRx = Math.max(30, rx - margin);
+            const safeRy = Math.max(25, ry - margin);
+            const angle = Math.random() * Math.PI * 2;
+            const dist = Math.sqrt(Math.random()) * 0.85;
+            return {
+                x: cx + Math.cos(angle) * safeRx * dist,
+                y: cy + Math.sin(angle) * safeRy * dist
+            };
+        }
+
+        function clampToIce(x, y, margin = 22) {
+            const { cx, cy, rx, ry } = getIceGeometry();
+            const safeRx = Math.max(25, rx - margin);
+            const safeRy = Math.max(20, ry - margin);
+            const dx = (x - cx) / safeRx;
+            const dy = (y - cy) / safeRy;
+            const d2 = dx * dx + dy * dy;
+            if (d2 > 1) {
+                const d = Math.sqrt(d2);
+                if (d > 0.0001) {
+                    return {
+                        x: cx + (dx / d) * safeRx,
+                        y: cy + (dy / d) * safeRy
+                    };
+                }
+            }
+            return { x, y };
+        }
+
+        // =========================================================================
+        // 4. HERNÍ STAV, ULOŽENÍ A MIGRACE DAT
+        // =========================================================================
+        const STORAGE_KEY = 'tucnaci_rezervace_save_v4';
+        let currentShopTab = 'penguins';
+        let nextEntityId = 1;
+        let globalTotalCoins = 0;
+
+        function createDefaultState(gameMode = 1) {
+            return {
+                gameMode: gameMode === 2 ? 2 : 1,
+                coins: 40,
+                totalCoinsEarned: globalTotalCoins,
+                morale: 100,
+                maxPenguins: ICE_CAPACITIES[0],
+                penguins: [],
+                eggs: [],
+                droppedCoins: [],
+                fishes: [],
+                hunters: [],
+                snowballs: [],
+                butterRockets: [],
+                carrots: [],
+                butterSlicks: [],
+                particles: [],
+                floatingTexts: [],
+                snowflakes: [],
+                collectors: {
+                    silver: 0,
+                    gold: 0,
+                    diamond: 0
+                },
+                collectorAgents: [],
+                hamsterAgent: null,
+                rabbitAgent: null,
+                dogAgent: null,
+                upgrades: {
+                    islandExpansion: 0, // 0..3 -> Úroveň 1/4 až 4/4
+                    hamsterLevel: 0,    // 0..3
+                    rabbitLevel: 0,     // 0..3
+                    incubatorLevel: 0,  // 0..3
+                    fishQuality: 0,     // 0..3
+                    guardDogLevel: 0,   // 0..3
+                    butterRockets: 0,   // 0..3
+                    snowCannon: 0,      // 0..3
+                    walrusGuard: 0      // 0..3
+                },
+                raidTimer: 46,
+                raidActive: false,
+                raidCount: 0,
+                walrusCooldown: 0,
+                cannonCooldown: 0,
+                rocketCooldown: 0
+            };
+        }
+
+        let gameState = createDefaultState(1);
+
+        function initSnowflakes() {
+            gameState.snowflakes = [];
+            for (let i = 0; i < 42; i++) {
+                gameState.snowflakes.push({
+                    x: Math.random() * viewWidth,
+                    y: Math.random() * viewHeight,
+                    r: 1.2 + Math.random() * 2.2,
+                    vy: 14 + Math.random() * 22,
+                    drift: Math.random() * Math.PI * 2
+                });
+            }
+        }
+
+        function createPenguin(species = 'adelie', stage = 'baby', x = null, y = null) {
+            const validSpecies = SPECIES_CONFIG[species] ? species : 'adelie';
+            const pos = (x !== null && y !== null) ? clampToIce(x, y, 25) : getRandomIcePoint(30);
+            const name = PENGUIN_NAMES[Math.floor(Math.random() * PENGUIN_NAMES.length)];
+            return {
+                id: nextEntityId++,
+                name,
+                species: validSpecies,
+                stage: stage === 'adult' ? 'adult' : 'baby',
+                growth: stage === 'adult' ? SPECIES_CONFIG[validSpecies].growthNeeded : 0,
+                x: pos.x,
+                y: pos.y,
+                targetX: pos.x,
+                targetY: pos.y,
+                facing: Math.random() < 0.5 ? 1 : -1,
+                waddlePhase: Math.random() * Math.PI * 2,
+                blinkTimer: 1 + Math.random() * 3,
+                isBlinking: false,
+                hopTimer: 0,
+                need: null,
+                needCooldown: 3 + Math.random() * 3.5,
+                capturedBy: null
+            };
+        }
+
+        function createEgg(species = 'adelie', x = null, y = null) {
+            const validSpecies = SPECIES_CONFIG[species] ? species : 'adelie';
+            const pos = (x !== null && y !== null) ? clampToIce(x, y, 28) : getRandomIcePoint(32);
+            return {
+                id: nextEntityId++,
+                species: validSpecies,
+                x: pos.x,
+                y: pos.y,
+                warmth: 0,
+                wobble: 0
+            };
+        }
+
+        function initNewGame(mode = 1) {
+            const targetMode = (mode === 2 && globalTotalCoins >= NG2_UNLOCK_COINS) ? 2 : 1;
+            gameState = createDefaultState(targetMode);
+            initSnowflakes();
+            const { cx, cy } = getIceGeometry();
+
+            // Startovní stav: 2 malá mláďata tučňáka kroužkového, 1 vejce, 40 mincí, kra Úroveň 1/4
+            const p1 = createPenguin('adelie', 'baby', cx - 44, cy + 12);
+            const p2 = createPenguin('adelie', 'baby', cx + 44, cy + 14);
+            p1.need = 'hunger';
+            p2.need = 'pet';
+
+            const egg1 = createEgg('adelie', cx, cy - 22);
+
+            gameState.penguins.push(p1, p2);
+            gameState.eggs.push(egg1);
+
+            syncAllCompanions();
+            renderShop();
+            updateUI();
+        }
+
+        function saveGame(showFeedback = false) {
+            try {
+                const dataToSave = {
+                    gameMode: gameState.gameMode,
+                    coins: gameState.coins,
+                    totalCoinsEarned: Math.max(globalTotalCoins, gameState.totalCoinsEarned || 0),
+                    morale: gameState.morale,
+                    maxPenguins: gameState.maxPenguins,
+                    penguins: gameState.penguins.map(p => ({ ...p, capturedBy: null })),
+                    eggs: gameState.eggs,
+                    droppedCoins: gameState.droppedCoins,
+                    collectors: gameState.collectors,
+                    upgrades: gameState.upgrades,
+                    raidTimer: gameState.raidTimer,
+                    raidCount: gameState.raidCount
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+                if (showFeedback) {
+                    showToast('💾 Hra byla uložena!');
+                    sound.playBuy();
+                }
+            } catch (e) {
+                if (showFeedback) showToast('⚠️ Uložení do prohlížeče se nezdařilo.');
+            }
+        }
+
+        function loadGame() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return false;
+                const parsed = JSON.parse(raw);
+                if (!parsed || typeof parsed !== 'object') return false;
+
+                globalTotalCoins = Math.max(0, Math.floor(Number(parsed.totalCoinsEarned) || 0));
+                const savedMode = (parsed.gameMode === 2 && globalTotalCoins >= NG2_UNLOCK_COINS) ? 2 : 1;
+                const def = createDefaultState(savedMode);
+
+                const savedUpgrades = (parsed.upgrades && typeof parsed.upgrades === 'object') ? parsed.upgrades : {};
+                const exp = Math.min(3, Math.max(0, Number(savedUpgrades.islandExpansion) || 0));
+
+                gameState = {
+                    ...def,
+                    gameMode: savedMode,
+                    coins: typeof parsed.coins === 'number' && !Number.isNaN(parsed.coins) ? Math.max(0, Math.floor(parsed.coins)) : 40,
+                    totalCoinsEarned: globalTotalCoins,
+                    morale: typeof parsed.morale === 'number' ? Math.min(150, Math.max(50, parsed.morale)) : 100,
+                    maxPenguins: ICE_CAPACITIES[exp] || 6,
+                    collectors: {
+                        silver: Math.min(3, Math.max(0, Number(parsed.collectors?.silver) || 0)),
+                        gold: Math.min(3, Math.max(0, Number(parsed.collectors?.gold) || 0)),
+                        diamond: Math.min(3, Math.max(0, Number(parsed.collectors?.diamond) || 0))
+                    },
+                    upgrades: {
+                        ...def.upgrades,
+                        islandExpansion: exp,
+                        hamsterLevel: Math.min(3, Math.max(0, Number(savedUpgrades.hamsterLevel) || 0)),
+                        rabbitLevel: Math.min(3, Math.max(0, Number(savedUpgrades.rabbitLevel) || 0)),
+                        incubatorLevel: Math.min(3, Math.max(0, Number(savedUpgrades.incubatorLevel) || 0)),
+                        fishQuality: Math.min(3, Math.max(0, Number(savedUpgrades.fishQuality) || 0)),
+                        guardDogLevel: Math.min(3, Math.max(0, Number(savedUpgrades.guardDogLevel) || 0)),
+                        butterRockets: Math.min(3, Math.max(0, Number(savedUpgrades.butterRockets) || 0)),
+                        snowCannon: Math.min(3, Math.max(0, Number(savedUpgrades.snowCannon) || 0)),
+                        walrusGuard: Math.min(3, Math.max(0, Number(savedUpgrades.walrusGuard) || 0))
+                    },
+                    raidTimer: typeof parsed.raidTimer === 'number' ? Math.max(15, parsed.raidTimer) : 46,
+                    raidCount: typeof parsed.raidCount === 'number' ? Math.max(0, parsed.raidCount) : 0
+                };
+
+                if (Array.isArray(parsed.penguins)) {
+                    gameState.penguins = parsed.penguins.map(p => {
+                        const pos = clampToIce(Number(p.x) || viewWidth * 0.5, Number(p.y) || viewHeight * 0.5, 25);
+                        const sp = SPECIES_CONFIG[p.species] ? p.species : 'adelie';
+                        return {
+                            id: nextEntityId++,
+                            name: p.name || 'Pingu',
+                            species: sp,
+                            stage: p.stage === 'adult' ? 'adult' : 'baby',
+                            growth: Number(p.growth) || 0,
+                            x: pos.x,
+                            y: pos.y,
+                            targetX: pos.x,
+                            targetY: pos.y,
+                            facing: p.facing === -1 ? -1 : 1,
+                            waddlePhase: Math.random() * 6,
+                            blinkTimer: 1 + Math.random() * 3,
+                            isBlinking: false,
+                            hopTimer: 0,
+                            need: ['hunger', 'pet', 'warm'].includes(p.need) ? p.need : null,
+                            needCooldown: Number(p.needCooldown) || 3,
+                            capturedBy: null
+                        };
+                    });
+                }
+
+                if (Array.isArray(parsed.eggs)) {
+                    gameState.eggs = parsed.eggs.map(e => {
+                        const pos = clampToIce(Number(e.x) || viewWidth * 0.5, Number(e.y) || viewHeight * 0.5, 28);
+                        return {
+                            id: nextEntityId++,
+                            species: SPECIES_CONFIG[e.species] ? e.species : 'adelie',
+                            x: pos.x,
+                            y: pos.y,
+                            warmth: Math.min(100, Math.max(0, Number(e.warmth) || 0)),
+                            wobble: 0
+                        };
+                    });
+                }
+
+                if (Array.isArray(parsed.droppedCoins)) {
+                    gameState.droppedCoins = parsed.droppedCoins.map(c => {
+                        const pos = clampToIce(Number(c.x) || viewWidth * 0.5, Number(c.y) || viewHeight * 0.5, 20);
+                        const cType = COIN_CONFIG[c.type] ? c.type : 'silver';
+                        return {
+                            id: nextEntityId++,
+                            type: cType,
+                            value: Math.max(1, Number(c.value) || COIN_CONFIG[cType].baseValue),
+                            x: pos.x,
+                            y: pos.y,
+                            vz: 0,
+                            z: 0,
+                            vx: 0,
+                            vy: 0,
+                            age: 0
+                        };
+                    });
+                }
+
+                if (gameState.penguins.length === 0 && gameState.eggs.length === 0) {
+                    return false;
+                }
+
+                initSnowflakes();
+                syncAllCompanions();
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // =========================================================================
+        // 5. SYNCHRONIZACE SPOLEČNÍKŮ (SBĚRAČI, KŘEČEK, KRÁLÍK, HLÍDACÍ PES)
+        // =========================================================================
+        function syncAllCompanions() {
+            // Sběrači mincí (1 tučňák na každý zakoupený druh mince, úroveň 1..3 zvyšuje jeho rychlost)
+            const types = ['silver', 'gold', 'diamond'];
+            const nextCollectors = [];
+            types.forEach(type => {
+                const lvl = gameState.collectors[type] || 0;
+                if (lvl > 0) {
+                    const existing = gameState.collectorAgents.find(a => a.coinType === type);
+                    if (existing) {
+                        existing.level = lvl;
+                        nextCollectors.push(existing);
+                    } else {
+                        const pos = getRandomIcePoint(32);
+                        nextCollectors.push({
+                            id: nextEntityId++,
+                            coinType: type,
+                            level: lvl,
+                            x: pos.x,
+                            y: pos.y,
+                            targetX: pos.x,
+                            targetY: pos.y,
+                            facing: 1,
+                            waddlePhase: Math.random() * 6
+                        });
+                    }
+                }
+            });
+            gameState.collectorAgents = nextCollectors;
+
+            // Malý křeček
+            if (gameState.upgrades.hamsterLevel > 0) {
+                if (!gameState.hamsterAgent) {
+                    const pos = getRandomIcePoint(25);
+                    gameState.hamsterAgent = {
+                        x: pos.x,
+                        y: pos.y,
+                        targetX: pos.x,
+                        targetY: pos.y,
+                        runPhase: 0,
+                        flipTimer: 0,
+                        flipAngle: 0,
+                        facing: 1,
+                        auraTimer: 0
+                    };
+                }
+            } else {
+                gameState.hamsterAgent = null;
+            }
+
+            // Drzý králík
+            if (gameState.upgrades.rabbitLevel > 0) {
+                if (!gameState.rabbitAgent) {
+                    const pos = getRandomIcePoint(25);
+                    gameState.rabbitAgent = {
+                        x: pos.x,
+                        y: pos.y,
+                        targetX: pos.x,
+                        targetY: pos.y,
+                        hopPhase: 0,
+                        flipTimer: 0,
+                        flipAngle: 0,
+                        facing: 1,
+                        carrotCooldown: 0
+                    };
+                }
+            } else {
+                gameState.rabbitAgent = null;
+            }
+
+            // Hlídací pes
+            if (gameState.upgrades.guardDogLevel > 0) {
+                if (!gameState.dogAgent) {
+                    const { cx, cy, ry } = getIceGeometry();
+                    gameState.dogAgent = {
+                        x: cx,
+                        y: cy + ry * 0.55,
+                        targetX: cx,
+                        targetY: cy + ry * 0.55,
+                        runPhase: 0,
+                        facing: 1,
+                        biteCooldown: 0
+                    };
+                }
+            } else {
+                gameState.dogAgent = null;
+            }
+        }
+
+        // =========================================================================
+        // 6. VÝPOČET HODNOTY MINCÍ, MORÁLKA A HERNÍ AKCE
+        // =========================================================================
+        function getCoinMultiplier() {
+            const ng2Bonus = gameState.gameMode === 2 ? 1.5 : 1.0;
+            const moraleBonus = 1 + Math.max(0, (gameState.morale - 100) / 100);
+            return ng2Bonus * moraleBonus;
+        }
+
+        function getEffectiveCoinValue(coinType) {
+            const base = (COIN_CONFIG[coinType] || COIN_CONFIG.silver).baseValue;
+            return Math.round(base * getCoinMultiplier());
+        }
+
+        function spawnCoinFromPenguin(penguin) {
+            const spec = SPECIES_CONFIG[penguin.species] || SPECIES_CONFIG.adelie;
+            const cConf = COIN_CONFIG[spec.coinType] || COIN_CONFIG.silver;
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 42 + Math.random() * 38;
+            const val = getEffectiveCoinValue(cConf.type);
+
+            gameState.droppedCoins.push({
+                id: nextEntityId++,
+                type: cConf.type,
+                value: val,
+                x: penguin.x,
+                y: penguin.y - 8,
+                z: 14,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed * 0.7,
+                vz: 135 + Math.random() * 35,
+                age: 0
+            });
+            sound.playCoinDrop();
+        }
+
+        function addCoins(amount) {
+            const safeAmount = Math.max(0, Math.floor(amount));
+            gameState.coins += safeAmount;
+            const prevTotal = globalTotalCoins;
+            globalTotalCoins += safeAmount;
+            gameState.totalCoinsEarned = globalTotalCoins;
+
+            if (prevTotal < NG2_UNLOCK_COINS && globalTotalCoins >= NG2_UNLOCK_COINS) {
+                sound.playHatch();
+                showToast('⚡ GRATULUJEME! Nasbíral jsi 10 000 mincí a odemkl NEW GAME 2 (Turbo)!');
+            }
+        }
+
+        function collectCoin(coin) {
+            const idx = gameState.droppedCoins.indexOf(coin);
+            if (idx === -1) return;
+            gameState.droppedCoins.splice(idx, 1);
+            addCoins(coin.value);
+            sound.playCoin(coin.type);
+            const color = coin.type === 'diamond' ? '#7dd3fc' : (coin.type === 'gold' ? '#fde047' : '#f8fafc');
+            addFloatingText(coin.x, coin.y - 12, `+${coin.value} 🪙`, color);
+            spawnParticles(coin.x, coin.y, color, 8);
+            updateUI();
+            renderShop();
+        }
+
+        function satisfyPenguinNeed(penguin, bonusMorale = 2) {
+            if (!penguin || !penguin.need) return;
+            const satisfiedType = penguin.need;
+            penguin.need = null;
+            const fishBonus = gameState.upgrades.fishQuality || 0;
+            penguin.needCooldown = Math.max(2.2, 6.2 - fishBonus * 0.7);
+            penguin.hopTimer = 0.45;
+
+            const maxMorale = 100 + (gameState.upgrades.rabbitLevel || 0) * 16 + (gameState.upgrades.hamsterLevel || 0) * 6;
+            gameState.morale = Math.min(maxMorale, gameState.morale + bonusMorale + fishBonus);
+
+            const spec = SPECIES_CONFIG[penguin.species] || SPECIES_CONFIG.adelie;
+            if (penguin.stage === 'baby') {
+                const gain = 28 + fishBonus * 12;
+                penguin.growth += gain;
+                if (penguin.growth >= spec.growthNeeded) {
+                    penguin.stage = 'adult';
+                    penguin.growth = spec.growthNeeded;
+                    sound.playHatch();
+                    addFloatingText(penguin.x, penguin.y - 34, `⭐ ${penguin.name} dospěl!`, '#fde047');
+                    spawnParticles(penguin.x, penguin.y, '#fde047', 16);
+                }
+            }
+
+            sound.playHappy();
+            const emoji = satisfiedType === 'hunger' ? '🐟' : (satisfiedType === 'pet' ? '❤️' : '☀️');
+            addFloatingText(penguin.x, penguin.y - 24, emoji, '#ffffff');
+            spawnCoinFromPenguin(penguin);
+        }
+
+        function throwFishAt(x, y) {
+            const pos = clampToIce(x, y, 22);
+            gameState.fishes.push({
+                id: nextEntityId++,
+                x: pos.x,
+                y: pos.y,
+                z: 45,
+                vz: 0,
+                age: 0
+            });
+            sound.playSplash();
+        }
+
+        function throwFishCenter() {
+            const pt = getRandomIcePoint(35);
+            throwFishAt(pt.x, pt.y);
+            showToast('🐟 Hodil jsi čerstvou rybu na led!');
+        }
+
+        function warmAllEggsAndPenguins() {
+            let warmedCount = 0;
+            gameState.eggs.forEach(egg => {
+                egg.warmth = Math.min(100, egg.warmth + 25);
+                egg.wobble = 0.5;
+                spawnParticles(egg.x, egg.y - 10, '#fbbf24', 6);
+                warmedCount++;
+            });
+            gameState.penguins.forEach(p => {
+                if (p.need === 'warm') {
+                    satisfyPenguinNeed(p);
+                    warmedCount++;
+                }
+            });
+            if (warmedCount > 0) {
+                sound.playHappy();
+                showToast('☀️ Zahřál jsi všechna vejce i zimomřivé tučňáky!');
+            } else {
+                const { cx, cy } = getIceGeometry();
+                spawnParticles(cx, cy, '#fde047', 12);
+                showToast('☀️ Sluneční paprsky prohřály ledovou kru.');
+            }
+        }
+
+        function hatchEgg(egg) {
+            const idx = gameState.eggs.indexOf(egg);
+            if (idx === -1) return;
+            if (gameState.penguins.length >= gameState.maxPenguins) {
+                egg.warmth = 95;
+                showToast('⚠️ Rezervace je plná! Rozšiř ledovou kru v obchodě.');
+                return;
+            }
+            gameState.eggs.splice(idx, 1);
+            const baby = createPenguin(egg.species, 'baby', egg.x, egg.y);
+            baby.need = 'hunger';
+            gameState.penguins.push(baby);
+            sound.playHatch();
+            spawnParticles(egg.x, egg.y, '#ffffff', 18);
+            addFloatingText(egg.x, egg.y - 25, `🐣 Vylíhl se ${baby.name}!`, '#7dd3fc');
+            updateUI();
+            renderShop();
+        }
+
+        // --- NÁJEZDY LOVCŮ (1 až 5 člunů podle počtu odražených vln a velikosti kolonie) ---
+        function startHunterRaid() {
+            if (gameState.penguins.length === 0) return;
+            gameState.raidActive = true;
+            gameState.raidCount++;
+            const banner = document.getElementById('raid-banner');
+            if (banner) banner.classList.add('visible');
+            sound.playAlarm();
+
+            const colonyFactor = Math.floor(gameState.penguins.length / 4);
+            const boatCount = Math.min(5, Math.max(1, 1 + Math.floor(gameState.raidCount / 2) + Math.floor(colonyFactor / 2)));
+            const { cx, cy, rx, ry } = getIceGeometry();
+
+            for (let i = 0; i < boatCount; i++) {
+                const side = i % 4;
+                let sx = cx, sy = cy;
+                if (side === 0) { sx = -45; sy = (0.15 + Math.random() * 0.7) * viewHeight; }
+                else if (side === 1) { sx = viewWidth + 45; sy = (0.15 + Math.random() * 0.7) * viewHeight; }
+                else if (side === 2) { sx = (0.15 + Math.random() * 0.7) * viewWidth; sy = -45; }
+                else { sx = (0.15 + Math.random() * 0.7) * viewWidth; sy = viewHeight + 45; }
+
+                const edgeAngle = Math.atan2(sy - cy, sx - cx);
+                const shoreX = cx + Math.cos(edgeAngle) * (rx + 18);
+                const shoreY = cy + Math.sin(edgeAngle) * (ry + 14);
+                const maxHp = 3 + Math.floor(gameState.raidCount * 0.9);
+
+                gameState.hunters.push({
+                    id: nextEntityId++,
+                    x: sx,
+                    y: sy,
+                    startX: sx,
+                    startY: sy,
+                    shoreX,
+                    shoreY,
+                    hp: maxHp,
+                    maxHp,
+                    state: 'approaching',
+                    targetPenguinId: null,
+                    hitFlash: 0,
+                    stunTimer: 0,
+                    slowTimer: 0
+                });
+            }
+        }
+
+        function throwSnowballAt(tx, ty, damage = 1) {
+            const { cx, cy } = getIceGeometry();
+            gameState.snowballs.push({
+                x: cx,
+                y: cy,
+                tx,
+                ty,
+                damage,
+                speed: 540
+            });
+            sound.playThrow();
+        }
+
+        function launchButterRocket(targetHunter) {
+            if (!targetHunter) return;
+            const { cx, cy, rx, ry } = getIceGeometry();
+            const startX = cx + rx * 0.65;
+            const startY = cy - ry * 0.48;
+            const rocketLvl = gameState.upgrades.butterRockets || 1;
+            gameState.butterRockets.push({
+                x: startX,
+                y: startY,
+                targetId: targetHunter.id,
+                tx: targetHunter.x,
+                ty: targetHunter.y,
+                speed: 360 + rocketLvl * 50,
+                damage: 2 + rocketLvl * 2,
+                stunDuration: 1.6 + rocketLvl * 0.5,
+                angle: Math.atan2(targetHunter.y - startY, targetHunter.x - startX)
+            });
+            sound.playRocket();
+        }
+
+        function triggerButterExplosion(x, y, damage, stunDuration) {
+            sound.playButterBoom();
+            spawnParticles(x, y, '#fde047', 22);
+            spawnParticles(x, y, '#f59e0b', 14);
+            gameState.butterSlicks.push({
+                x,
+                y,
+                radius: 56,
+                life: 2.2
+            });
+
+            // Plošné poškození + uklouznutí/omráčení lovců v okruhu výbuchu
+            for (let i = gameState.hunters.length - 1; i >= 0; i--) {
+                const h = gameState.hunters[i];
+                if (Math.hypot(h.x - x, h.y - y) <= 68) {
+                    h.stunTimer = Math.max(h.stunTimer, stunDuration);
+                    addFloatingText(h.x, h.y - 36, '🧈 Uklouzl!', '#fef08a');
+                    damageHunter(h, damage);
+                }
+            }
+        }
+
+        function damageHunter(hunter, dmg) {
+            if (!hunter || hunter.hp <= 0) return;
+            hunter.hp -= dmg;
+            hunter.hitFlash = 0.2;
+            sound.playHit();
+            spawnParticles(hunter.x, hunter.y - 10, '#ffffff', 8);
+            addFloatingText(hunter.x, hunter.y - 24, `-${dmg}`, '#bae6fd');
+
+            if (hunter.hp <= 0) {
+                if (hunter.targetPenguinId !== null) {
+                    const p = gameState.penguins.find(item => item.id === hunter.targetPenguinId);
+                    if (p) {
+                        p.capturedBy = null;
+                        const safe = clampToIce(p.x, p.y, 28);
+                        p.x = safe.x;
+                        p.y = safe.y;
+                    }
+                }
+                const idx = gameState.hunters.indexOf(hunter);
+                if (idx !== -1) gameState.hunters.splice(idx, 1);
+
+                const reward = Math.round((15 + gameState.raidCount * 5) * (gameState.gameMode === 2 ? 1.5 : 1));
+                addCoins(reward);
+                addFloatingText(hunter.x, hunter.y - 30, `Lovec zahnán! +${reward} 🪙`, '#fde047');
+                spawnParticles(hunter.x, hunter.y, '#38bdf8', 16);
+                updateUI();
+                renderShop();
+            }
+        }
+
+        // =========================================================================
+        // 7. VIZUÁLNÍ EFEKTY A TEXTY
+        // =========================================================================
+        function spawnParticles(x, y, color, count = 8) {
+            for (let i = 0; i < count; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const spd = 25 + Math.random() * 65;
+                gameState.particles.push({
+                    x,
+                    y,
+                    vx: Math.cos(a) * spd,
+                    vy: Math.sin(a) * spd - 20,
+                    size: 2.5 + Math.random() * 2.5,
+                    color,
+                    life: 0.45 + Math.random() * 0.35,
+                    maxLife: 0.8
+                });
+            }
+        }
+
+        function addFloatingText(x, y, text, color = '#ffffff') {
+            gameState.floatingTexts.push({
+                x,
+                y,
+                text,
+                color,
+                life: 1.15
+            });
+        }
+
+        let toastTimeout = null;
+        function showToast(msg) {
+            const el = document.getElementById('toast-message');
+            if (!el) return;
+            el.textContent = msg;
+            el.classList.add('show');
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                el.classList.remove('show');
+            }, 2800);
+        }
+
+        // =========================================================================
+        // 8. HERNÍ SMYČKA A FYZIKA (S MULTIPLIKÁTOREM PRO NEW GAME 2)
+        // =========================================================================
+        function updateGame(rawDt) {
+            const speedMult = gameState.gameMode === 2 ? 2.2 : 1.0;
+            const dt = rawDt * speedMult;
+
+            // Sněžení
+            gameState.snowflakes.forEach(sf => {
+                sf.y += sf.vy * rawDt;
+                sf.x += Math.sin(sf.drift + sf.y * 0.02) * 10 * rawDt;
+                if (sf.y > viewHeight) {
+                    sf.y = -5;
+                    sf.x = Math.random() * viewWidth;
+                }
+            });
+
+            // 1. Morálka kolonie (Drzý králík a Malý křeček ji udržují vysoko)
+            const rabbitLvl = gameState.upgrades.rabbitLevel || 0;
+            const hamsterLvl = gameState.upgrades.hamsterLevel || 0;
+            const targetBaseMorale = 100 + rabbitLvl * 16 + hamsterLvl * 6;
+            if (gameState.morale < targetBaseMorale) {
+                gameState.morale = Math.min(targetBaseMorale, gameState.morale + (1.5 + rabbitLvl * 2.2) * dt);
+            } else if (gameState.morale > targetBaseMorale) {
+                gameState.morale = Math.max(targetBaseMorale, gameState.morale - 0.8 * dt);
+            }
+
+            // 2. Aktualizace tučňáků
+            gameState.penguins.forEach(p => {
+                if (p.hopTimer > 0) p.hopTimer = Math.max(0, p.hopTimer - dt);
+
+                // Mrkání očí
+                p.blinkTimer -= rawDt;
+                if (p.blinkTimer <= 0) {
+                    if (!p.isBlinking) {
+                        p.isBlinking = true;
+                        p.blinkTimer = 0.14;
+                    } else {
+                        p.isBlinking = false;
+                        p.blinkTimer = 2.2 + Math.random() * 3.5;
+                    }
+                }
+
+                if (p.capturedBy !== null) {
+                    const hunter = gameState.hunters.find(h => h.id === p.capturedBy);
+                    if (hunter) {
+                        p.x = hunter.x;
+                        p.y = hunter.y - 12;
+                        return;
+                    } else {
+                        p.capturedBy = null;
+                    }
+                }
+
+                // Tvorba potřeb
+                if (!p.need) {
+                    p.needCooldown -= dt;
+                    if (p.needCooldown <= 0) {
+                        const needs = ['hunger', 'pet', 'warm'];
+                        p.need = needs[Math.floor(Math.random() * needs.length)];
+                    }
+                }
+
+                // Hledání ryby na ledě, pokud má hlad
+                let targetX = p.targetX;
+                let targetY = p.targetY;
+                let movingToFish = false;
+
+                if (p.need === 'hunger' && gameState.fishes.length > 0) {
+                    let nearestFish = null;
+                    let bestDist = Infinity;
+                    gameState.fishes.forEach(f => {
+                        if (f.z <= 2) {
+                            const d = Math.hypot(f.x - p.x, f.y - p.y);
+                            if (d < bestDist) {
+                                bestDist = d;
+                                nearestFish = f;
+                            }
+                        }
+                    });
+                    if (nearestFish) {
+                        targetX = nearestFish.x;
+                        targetY = nearestFish.y;
+                        movingToFish = true;
+                        if (bestDist < 18) {
+                            const fIdx = gameState.fishes.indexOf(nearestFish);
+                            if (fIdx !== -1) gameState.fishes.splice(fIdx, 1);
+                            satisfyPenguinNeed(p, 3);
+                        }
+                    }
+                }
+
+                const dx = targetX - p.x;
+                const dy = targetY - p.y;
+                const dist = Math.hypot(dx, dy);
+
+                if (dist > 4) {
+                    const speed = (p.stage === 'baby' ? 36 : 28) * (movingToFish ? 1.55 : 1);
+                    if (dist > 0.001) {
+                        p.x += (dx / dist) * speed * dt;
+                        p.y += (dy / dist) * speed * dt;
+                    }
+                    p.waddlePhase += dt * (movingToFish ? 14 : 9);
+                    if (Math.abs(dx) > 0.4) p.facing = dx > 0 ? 1 : -1;
+                } else if (!movingToFish && Math.random() < 0.45 * dt) {
+                    const nextPt = getRandomIcePoint(28);
+                    p.targetX = nextPt.x;
+                    p.targetY = nextPt.y;
+                }
+
+                const clamped = clampToIce(p.x, p.y, 22);
+                p.x = clamped.x;
+                p.y = clamped.y;
+            });
+
+            // 3. Malý křeček – běhá za tučňáky, dělá kotrmelce a plní potřebu mazlení/hry
+            if (hamsterLvl > 0) {
+                syncAllCompanions();
+                const h = gameState.hamsterAgent;
+                const hSpeed = 92 + (hamsterLvl - 1) * 32;
+                const auraRadius = 68 + hamsterLvl * 24;
+
+                if (h.flipTimer > 0) {
+                    h.flipTimer = Math.max(0, h.flipTimer - dt);
+                    h.flipAngle += dt * 16;
+                } else {
+                    h.flipAngle = 0;
+                    let targetP = null;
+                    let bestScore = Infinity;
+
+                    gameState.penguins.forEach(p => {
+                        if (p.capturedBy !== null) return;
+                        const d = Math.hypot(p.x - h.x, p.y - h.y);
+                        const bonus = p.need === 'pet' ? -280 : (p.need ? -80 : 0);
+                        if (d + bonus < bestScore) {
+                            bestScore = d + bonus;
+                            targetP = p;
+                        }
+                    });
+
+                    if (targetP) {
+                        h.targetX = targetP.x + (targetP.x > h.x ? -18 : 18);
+                        h.targetY = targetP.y + 6;
+                        const dx = h.targetX - h.x;
+                        const dy = h.targetY - h.y;
+                        const dist = Math.hypot(dx, dy);
+
+                        if (dist > 6 && dist > 0.001) {
+                            h.x += (dx / dist) * hSpeed * dt;
+                            h.y += (dy / dist) * hSpeed * dt;
+                            h.runPhase += dt * 22;
+                            if (Math.abs(dx) > 0.4) h.facing = dx > 0 ? 1 : -1;
+                        } else {
+                            h.flipTimer = 0.55;
+                            spawnParticles(h.x, h.y - 6, '#f472b6', 6);
+                            if (targetP.need === 'pet') {
+                                satisfyPenguinNeed(targetP, 3);
+                            } else if (targetP.need && hamsterLvl >= 2 && Math.random() < 0.4) {
+                                satisfyPenguinNeed(targetP, 2);
+                            }
+                        }
+                    }
+                }
+
+                h.auraTimer += dt;
+                if (h.auraTimer >= Math.max(1.2, 2.6 - hamsterLvl * 0.45)) {
+                    h.auraTimer = 0;
+                    gameState.penguins.forEach(p => {
+                        if (p.capturedBy !== null) return;
+                        if (Math.hypot(p.x - h.x, p.y - h.y) <= auraRadius) {
+                            if (p.need === 'pet') {
+                                satisfyPenguinNeed(p, 2);
+                            } else if (p.needCooldown > 1.5) {
+                                p.needCooldown = Math.max(1.0, p.needCooldown - 1.1 * hamsterLvl);
+                                addFloatingText(p.x, p.y - 26, '🐹💖', '#f472b6');
+                            }
+                        }
+                    });
+                }
+
+                const clampedH = clampToIce(h.x, h.y, 20);
+                h.x = clampedH.x;
+                h.y = clampedH.y;
+            }
+
+            // 4. Drzý králík – skáče po kře, dělá přemety pro morálku a hází po lovcích mrkve
+            if (rabbitLvl > 0) {
+                syncAllCompanions();
+                const rb = gameState.rabbitAgent;
+                const rbSpeed = 88 + (rabbitLvl - 1) * 28;
+
+                if (rb.flipTimer > 0) {
+                    rb.flipTimer = Math.max(0, rb.flipTimer - dt);
+                    rb.flipAngle += dt * 15;
+                } else {
+                    rb.flipAngle = 0;
+                    const dx = rb.targetX - rb.x;
+                    const dy = rb.targetY - rb.y;
+                    const dist = Math.hypot(dx, dy);
+
+                    if (dist > 7 && dist > 0.001) {
+                        rb.x += (dx / dist) * rbSpeed * dt;
+                        rb.y += (dy / dist) * rbSpeed * dt;
+                        rb.hopPhase += dt * 14;
+                        if (Math.abs(dx) > 0.4) rb.facing = dx > 0 ? 1 : -1;
+                    } else {
+                        rb.flipTimer = 0.6;
+                        const nextPt = getRandomIcePoint(30);
+                        rb.targetX = nextPt.x;
+                        rb.targetY = nextPt.y;
+                        // Občas pobaví tučňáka s potřebou mazlení
+                        const petPeng = gameState.penguins.find(p => p.need === 'pet' && Math.hypot(p.x - rb.x, p.y - rb.y) < 120);
+                        if (petPeng) {
+                            satisfyPenguinNeed(petPeng, 4);
+                        }
+                    }
+                }
+
+                // Při útoku lovců hází mrkve!
+                if (gameState.hunters.length > 0) {
+                    rb.carrotCooldown -= dt;
+                    if (rb.carrotCooldown <= 0) {
+                        rb.carrotCooldown = Math.max(0.65, 1.8 - rabbitLvl * 0.35);
+                        const target = gameState.hunters[Math.floor(Math.random() * gameState.hunters.length)];
+                        gameState.carrots.push({
+                            x: rb.x,
+                            y: rb.y - 8,
+                            tx: target.x,
+                            ty: target.y,
+                            damage: 1 + rabbitLvl,
+                            speed: 460,
+                            rot: 0
+                        });
+                        sound.playThrow();
+                    }
+                }
+
+                const clampedRb = clampToIce(rb.x, rb.y, 22);
+                rb.x = clampedRb.x;
+                rb.y = clampedRb.y;
+            }
+
+            // 5. Vejce a Vyhřívaný inkubátor
+            const passiveWarmRate = (gameState.upgrades.incubatorLevel || 0) * 8.5;
+            for (let i = gameState.eggs.length - 1; i >= 0; i--) {
+                const egg = gameState.eggs[i];
+                if (egg.wobble > 0) egg.wobble = Math.max(0, egg.wobble - dt * 2);
+                if (passiveWarmRate > 0) {
+                    egg.warmth += passiveWarmRate * dt;
+                }
+                if (egg.warmth >= 100) {
+                    hatchEgg(egg);
+                }
+            }
+
+            // 6. Ryby na ledě
+            for (let i = gameState.fishes.length - 1; i >= 0; i--) {
+                const f = gameState.fishes[i];
+                f.age += dt;
+                if (f.z > 0) {
+                    f.vz -= 260 * dt;
+                    f.z = Math.max(0, f.z + f.vz * dt);
+                }
+                if (f.age > 18) gameState.fishes.splice(i, 1);
+            }
+
+            // 7. Padající mince
+            gameState.droppedCoins.forEach(coin => {
+                coin.age += dt;
+                if (coin.z > 0 || coin.vz > 0) {
+                    coin.x += coin.vx * dt;
+                    coin.y += coin.vy * dt;
+                    coin.vz -= 390 * dt;
+                    coin.z += coin.vz * dt;
+                    if (coin.z <= 0) {
+                        coin.z = 0;
+                        if (Math.abs(coin.vz) > 35) {
+                            coin.vz = -coin.vz * 0.42;
+                            coin.vx *= 0.6;
+                            coin.vy *= 0.6;
+                        } else {
+                            coin.vz = 0;
+                            coin.vx = 0;
+                            coin.vy = 0;
+                        }
+                    }
+                    const clamped = clampToIce(coin.x, coin.y, 18);
+                    coin.x = clamped.x;
+                    coin.y = clamped.y;
+                }
+            });
+
+            // 8. Tučňáci-sběrači mincí (úroveň 1..3 zvyšuje rychlost běhu)
+            gameState.collectorAgents.forEach(agent => {
+                const lvl = agent.level || 1;
+                const collectorSpeed = 82 + (lvl - 1) * 48;
+                let targetCoin = null;
+                let bestDist = Infinity;
+
+                gameState.droppedCoins.forEach(coin => {
+                    if (coin.type === agent.coinType && coin.z <= 4) {
+                        const d = Math.hypot(coin.x - agent.x, coin.y - agent.y);
+                        if (d < bestDist) {
+                            bestDist = d;
+                            targetCoin = coin;
+                        }
+                    }
+                });
+
+                if (targetCoin) {
+                    const dx = targetCoin.x - agent.x;
+                    const dy = targetCoin.y - agent.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < 16) {
+                        collectCoin(targetCoin);
+                    } else if (dist > 0.001) {
+                        agent.x += (dx / dist) * collectorSpeed * dt;
+                        agent.y += (dy / dist) * collectorSpeed * dt;
+                        agent.waddlePhase += dt * (14 + lvl * 3);
+                        if (Math.abs(dx) > 0.4) agent.facing = dx > 0 ? 1 : -1;
+                    }
+                } else {
+                    const dx = agent.targetX - agent.x;
+                    const dy = agent.targetY - agent.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > 5 && dist > 0.001) {
+                        agent.x += (dx / dist) * (collectorSpeed * 0.42) * dt;
+                        agent.y += (dy / dist) * (collectorSpeed * 0.42) * dt;
+                        agent.waddlePhase += dt * 9;
+                        if (Math.abs(dx) > 0.4) agent.facing = dx > 0 ? 1 : -1;
+                    } else if (Math.random() < 0.5 * dt) {
+                        const pt = getRandomIcePoint(30);
+                        agent.targetX = pt.x;
+                        agent.targetY = pt.y;
+                    }
+                }
+
+                const clamped = clampToIce(agent.x, agent.y, 24);
+                agent.x = clamped.x;
+                agent.y = clamped.y;
+            });
+
+            // 9. Obrana: Hlídací pes, Máslové rakety, Sněžné dělo, Mrož Barnabáš a Nájezdy lovců
+            const dogLvl = gameState.upgrades.guardDogLevel || 0;
+            if (dogLvl > 0 && gameState.dogAgent) {
+                const dog = gameState.dogAgent;
+                if (dog.biteCooldown > 0) dog.biteCooldown = Math.max(0, dog.biteCooldown - dt);
+
+                if (gameState.hunters.length > 0) {
+                    // Vyrazí k nejbližšímu lovci na okraji kry
+                    let nearestH = gameState.hunters[0];
+                    let bestD = Infinity;
+                    gameState.hunters.forEach(h => {
+                        const d = Math.hypot(h.x - dog.x, h.y - dog.y);
+                        if (d < bestD) { bestD = d; nearestH = h; }
+                    });
+
+                    const attackPos = clampToIce(nearestH.x, nearestH.y, 12);
+                    const dx = attackPos.x - dog.x;
+                    const dy = attackPos.y - dog.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > 8 && dist > 0.001) {
+                        dog.x += (dx / dist) * (115 + dogLvl * 25) * dt;
+                        dog.y += (dy / dist) * (115 + dogLvl * 25) * dt;
+                        dog.runPhase += dt * 22;
+                        if (Math.abs(dx) > 0.4) dog.facing = dx > 0 ? 1 : -1;
+                    } else if (bestD < 52 && dog.biteCooldown <= 0) {
+                        dog.biteCooldown = Math.max(0.55, 1.35 - dogLvl * 0.25);
+                        nearestH.slowTimer = Math.max(nearestH.slowTimer, 1.8);
+                        sound.playBark();
+                        addFloatingText(dog.x, dog.y - 20, '🐕 Haf!', '#fde047');
+                        damageHunter(nearestH, 1 + dogLvl);
+                    }
+                } else {
+                    const { cx, cy, ry } = getIceGeometry();
+                    const homeX = cx - 35;
+                    const homeY = cy + ry * 0.55;
+                    const dx = homeX - dog.x;
+                    const dy = homeY - dog.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > 6 && dist > 0.001) {
+                        dog.x += (dx / dist) * 65 * dt;
+                        dog.y += (dy / dist) * 65 * dt;
+                        dog.runPhase += dt * 12;
+                        if (Math.abs(dx) > 0.4) dog.facing = dx > 0 ? 1 : -1;
+                    }
+                }
+            }
+
+            if (!gameState.raidActive) {
+                if (gameState.penguins.length > 0) {
+                    gameState.raidTimer -= dt;
+                    if (gameState.raidTimer <= 0) {
+                        startHunterRaid();
+                    }
+                }
+            } else {
+                // Strážný mrož Barnabáš
+                const walrusLvl = gameState.upgrades.walrusGuard || 0;
+                if (walrusLvl > 0 && gameState.hunters.length > 0) {
+                    gameState.walrusCooldown -= dt;
+                    if (gameState.walrusCooldown <= 0) {
+                        gameState.walrusCooldown = Math.max(0.75, 2.2 - walrusLvl * 0.4);
+                        const target = gameState.hunters[0];
+                        throwSnowballAt(target.x, target.y, 1 + walrusLvl);
+                    }
+                }
+
+                // Automatické sněžné dělo
+                const cannonLvl = gameState.upgrades.snowCannon || 0;
+                if (cannonLvl > 0 && gameState.hunters.length > 0) {
+                    gameState.cannonCooldown -= dt;
+                    if (gameState.cannonCooldown <= 0) {
+                        gameState.cannonCooldown = Math.max(0.5, 1.5 - cannonLvl * 0.3);
+                        const target = gameState.hunters[gameState.hunters.length - 1];
+                        throwSnowballAt(target.x, target.y, 1 + cannonLvl);
+                    }
+                }
+
+                // Odpalovací rampa máslových raket
+                const rocketLvl = gameState.upgrades.butterRockets || 0;
+                if (rocketLvl > 0 && gameState.hunters.length > 0) {
+                    gameState.rocketCooldown -= dt;
+                    if (gameState.rocketCooldown <= 0) {
+                        gameState.rocketCooldown = Math.max(1.4, 3.4 - rocketLvl * 0.55);
+                        const target = gameState.hunters[Math.floor(Math.random() * gameState.hunters.length)];
+                        launchButterRocket(target);
+                    }
+                }
+
+                // Pohyb lovců
+                for (let i = gameState.hunters.length - 1; i >= 0; i--) {
+                    const h = gameState.hunters[i];
+                    if (h.hitFlash > 0) h.hitFlash = Math.max(0, h.hitFlash - dt);
+                    if (h.slowTimer > 0) h.slowTimer = Math.max(0, h.slowTimer - dt);
+
+                    if (h.stunTimer > 0) {
+                        h.stunTimer = Math.max(0, h.stunTimer - dt);
+                        continue; // Omráčen uklouznutím na másle
+                    }
+
+                    const slowFactor = h.slowTimer > 0 ? 0.45 : 1.0;
+
+                    if (h.state === 'approaching') {
+                        const dx = h.shoreX - h.x;
+                        const dy = h.shoreY - h.y;
+                        const dist = Math.hypot(dx, dy);
+                        if (dist > 6 && dist > 0.001) {
+                            h.x += (dx / dist) * 46 * slowFactor * dt;
+                            h.y += (dy / dist) * 46 * slowFactor * dt;
+                        } else {
+                            const freePenguin = gameState.penguins.find(p => p.capturedBy === null);
+                            if (freePenguin) {
+                                freePenguin.capturedBy = h.id;
+                                h.targetPenguinId = freePenguin.id;
+                            }
+                            h.state = 'fleeing';
+                        }
+                    } else if (h.state === 'fleeing') {
+                        const dx = h.startX - h.x;
+                        const dy = h.startY - h.y;
+                        const dist = Math.hypot(dx, dy);
+                        if (dist > 8 && dist > 0.001) {
+                            h.x += (dx / dist) * 32 * slowFactor * dt;
+                            h.y += (dy / dist) * 32 * slowFactor * dt;
+                        } else {
+                            if (h.targetPenguinId !== null) {
+                                const pIdx = gameState.penguins.findIndex(p => p.id === h.targetPenguinId);
+                                if (pIdx !== -1) {
+                                    const stolen = gameState.penguins[pIdx];
+                                    gameState.penguins.splice(pIdx, 1);
+                                    showToast(`😢 Lovci odvezli tučňáka (${stolen.name})!`);
+                                }
+                            }
+                            gameState.hunters.splice(i, 1);
+                            updateUI();
+                            renderShop();
+                        }
+                    }
+                }
+
+                if (gameState.hunters.length === 0) {
+                    gameState.raidActive = false;
+                    gameState.raidTimer = Math.max(30, 54 - gameState.raidCount * 2);
+                    const banner = document.getElementById('raid-banner');
+                    if (banner) banner.classList.remove('visible');
+                    showToast('🛡️ Nájezd lovců úspěšně odražen!');
+                }
+            }
+
+            // 10. Projektily: sněhové koule, máslové rakety, mrkve a máslové skvrny
+            for (let i = gameState.snowballs.length - 1; i >= 0; i--) {
+                const sb = gameState.snowballs[i];
+                const dx = sb.tx - sb.x;
+                const dy = sb.ty - sb.y;
+                const dist = Math.hypot(dx, dy);
+                if (dist < 14 || dist <= 0.001) {
+                    let hitHunter = null;
+                    let bestD = 42;
+                    gameState.hunters.forEach(h => {
+                        const d = Math.hypot(h.x - sb.tx, h.y - sb.ty);
+                        if (d < bestD) { bestD = d; hitHunter = h; }
+                    });
+                    if (hitHunter) damageHunter(hitHunter, sb.damage);
+                    else spawnParticles(sb.tx, sb.ty, '#ffffff', 6);
+                    gameState.snowballs.splice(i, 1);
+                } else {
+                    sb.x += (dx / dist) * sb.speed * dt;
+                    sb.y += (dy / dist) * sb.speed * dt;
+                }
+            }
+
+            for (let i = gameState.butterRockets.length - 1; i >= 0; i--) {
+                const br = gameState.butterRockets[i];
+                const tracked = gameState.hunters.find(h => h.id === br.targetId);
+                if (tracked) {
+                    br.tx = tracked.x;
+                    br.ty = tracked.y;
+                }
+                const dx = br.tx - br.x;
+                const dy = br.ty - br.y;
+                const dist = Math.hypot(dx, dy);
+                if (dist < 18 || dist <= 0.001) {
+                    triggerButterExplosion(br.tx, br.ty, br.damage, br.stunDuration);
+                    gameState.butterRockets.splice(i, 1);
+                } else {
+                    br.angle = Math.atan2(dy, dx);
+                    br.x += (dx / dist) * br.speed * dt;
+                    br.y += (dy / dist) * br.speed * dt;
+                    if (Math.random() < 0.6) {
+                        spawnParticles(br.x, br.y, '#fef08a', 1);
+                    }
+                }
+            }
+
+            for (let i = gameState.carrots.length - 1; i >= 0; i--) {
+                const cr = gameState.carrots[i];
+                const dx = cr.tx - cr.x;
+                const dy = cr.ty - cr.y;
+                const dist = Math.hypot(dx, dy);
+                if (dist < 14 || dist <= 0.001) {
+                    let hitHunter = null;
+                    let bestD = 40;
+                    gameState.hunters.forEach(h => {
+                        const d = Math.hypot(h.x - cr.tx, h.y - cr.ty);
+                        if (d < bestD) { bestD = d; hitHunter = h; }
+                    });
+                    if (hitHunter) damageHunter(hitHunter, cr.damage);
+                    spawnParticles(cr.tx, cr.ty, '#fb923c', 6);
+                    gameState.carrots.splice(i, 1);
+                } else {
+                    cr.x += (dx / dist) * cr.speed * dt;
+                    cr.y += (dy / dist) * cr.speed * dt;
+                    cr.rot += dt * 18;
+                }
+            }
+
+            for (let i = gameState.butterSlicks.length - 1; i >= 0; i--) {
+                gameState.butterSlicks[i].life -= dt;
+                if (gameState.butterSlicks[i].life <= 0) gameState.butterSlicks.splice(i, 1);
+            }
+
+            // 11. Částice a plovoucí texty
+            for (let i = gameState.particles.length - 1; i >= 0; i--) {
+                const pt = gameState.particles[i];
+                pt.x += pt.vx * rawDt;
+                pt.y += pt.vy * rawDt;
+                pt.life -= rawDt;
+                if (pt.life <= 0) gameState.particles.splice(i, 1);
+            }
+
+            for (let i = gameState.floatingTexts.length - 1; i >= 0; i--) {
+                const ft = gameState.floatingTexts[i];
+                ft.y -= 26 * rawDt;
+                ft.life -= rawDt;
+                if (ft.life <= 0) gameState.floatingTexts.splice(i, 1);
+            }
+        }
+
+        // =========================================================================
+        // 9. VYKRESLOVÁNÍ SCÉNY (POLÁRNÍ ZÁŘE V NG2, KRA, TUČŇÁCI, OBRANA)
+        // =========================================================================
+        function drawScene(time) {
+            ctx.clearRect(0, 0, viewWidth, viewHeight);
+
+            // Polární záře v režimu New Game 2 (Turbo)
+            if (gameState.gameMode === 2) {
+                const auroraGrad = ctx.createLinearGradient(0, 0, viewWidth, viewHeight * 0.35);
+                auroraGrad.addColorStop(0, 'rgba(168, 85, 247, 0.24)');
+                auroraGrad.addColorStop(0.5, 'rgba(52, 211, 153, 0.20)');
+                auroraGrad.addColorStop(1, 'rgba(236, 72, 153, 0.24)');
+                ctx.fillStyle = auroraGrad;
+                ctx.fillRect(0, 0, viewWidth, viewHeight * 0.42);
+            }
+
+            // Mořské vlny na pozadí
+            ctx.strokeStyle = 'rgba(125, 211, 252, 0.14)';
+            ctx.lineWidth = 2;
+            for (let row = 0; row < 6; row++) {
+                const y = (viewHeight / 6) * row + 28;
+                ctx.beginPath();
+                for (let x = 0; x <= viewWidth; x += 40) {
+                    const wy = y + Math.sin(x * 0.02 + time * 1.8 + row) * 4;
+                    if (x === 0) ctx.moveTo(x, wy);
+                    else ctx.lineTo(x, wy);
+                }
+                ctx.stroke();
+            }
+
+            // Ledová kra
+            const { cx, cy, rx, ry } = getIceGeometry();
+
+            ctx.fillStyle = 'rgba(6, 21, 41, 0.48)';
+            ctx.beginPath();
+            ctx.ellipse(cx, cy + 16, rx + 6, ry + 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#7dd3fc';
+            ctx.beginPath();
+            ctx.ellipse(cx, cy + 10, rx, ry, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            const iceGrad = ctx.createRadialGradient(cx - rx * 0.2, cy - ry * 0.2, 20, cx, cy, Math.max(rx, ry));
+            iceGrad.addColorStop(0, '#ffffff');
+            iceGrad.addColorStop(0.75, '#e0f2fe');
+            iceGrad.addColorStop(1, '#bae6fd');
+            ctx.fillStyle = iceGrad;
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Kluzké máslové výbuchy na vodě
+            gameState.butterSlicks.forEach(bs => {
+                ctx.globalAlpha = Math.min(0.75, bs.life / 2.2);
+                ctx.fillStyle = '#fde047';
+                ctx.beginPath();
+                ctx.arc(bs.x, bs.y, bs.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            });
+
+            // Budovy a stacionární strážci na kře
+            if (gameState.upgrades.incubatorLevel > 0) {
+                drawIncubator(cx - rx * 0.56, cy - ry * 0.46);
+            }
+            if (gameState.upgrades.butterRockets > 0) {
+                drawButterLauncher(cx + rx * 0.62, cy - ry * 0.46);
+            }
+            if (gameState.upgrades.walrusGuard > 0) {
+                drawWalrus(cx - rx * 0.62, cy + ry * 0.42);
+            }
+            if (gameState.upgrades.snowCannon > 0) {
+                drawSnowCannon(cx + rx * 0.62, cy + ry * 0.42);
+            }
+
+            // Seřazení entit podle osy Y
+            const renderList = [];
+            gameState.eggs.forEach(egg => renderList.push({ type: 'egg', y: egg.y, obj: egg }));
+            gameState.fishes.forEach(fish => renderList.push({ type: 'fish', y: fish.y, obj: fish }));
+            gameState.penguins.forEach(p => renderList.push({ type: 'penguin', y: p.y, obj: p }));
+            gameState.collectorAgents.forEach(a => renderList.push({ type: 'collector', y: a.y, obj: a }));
+            if (gameState.hamsterAgent) {
+                renderList.push({ type: 'hamster', y: gameState.hamsterAgent.y, obj: gameState.hamsterAgent });
+            }
+            if (gameState.rabbitAgent) {
+                renderList.push({ type: 'rabbit', y: gameState.rabbitAgent.y, obj: gameState.rabbitAgent });
+            }
+            if (gameState.dogAgent) {
+                renderList.push({ type: 'dog', y: gameState.dogAgent.y, obj: gameState.dogAgent });
+            }
+            gameState.droppedCoins.forEach(coin => renderList.push({ type: 'coin', y: coin.y, obj: coin }));
+            gameState.hunters.forEach(h => renderList.push({ type: 'hunter', y: h.y, obj: h }));
+
+            renderList.sort((a, b) => a.y - b.y);
+
+            renderList.forEach(item => {
+                if (item.type === 'egg') drawEgg(item.obj);
+                else if (item.type === 'fish') drawFish(item.obj);
+                else if (item.type === 'penguin') drawPenguin(item.obj, time);
+                else if (item.type === 'collector') drawCollectorAgent(item.obj);
+                else if (item.type === 'hamster') drawHamster(item.obj, time);
+                else if (item.type === 'rabbit') drawRabbit(item.obj, time);
+                else if (item.type === 'dog') drawGuardDog(item.obj, time);
+                else if (item.type === 'coin') drawDroppedCoin(item.obj, time);
+                else if (item.type === 'hunter') drawHunter(item.obj);
+            });
+
+            // Sněhové koule
+            gameState.snowballs.forEach(sb => {
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(sb.x, sb.y, 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#7dd3fc';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+
+            // Máslové rakety
+            gameState.butterRockets.forEach(br => {
+                ctx.save();
+                ctx.translate(br.x, br.y);
+                ctx.rotate(br.angle);
+                ctx.fillStyle = '#facc15';
+                ctx.fillRect(-10, -4, 18, 8);
+                ctx.fillStyle = '#ea580c';
+                ctx.beginPath();
+                ctx.moveTo(8, -4);
+                ctx.lineTo(15, 0);
+                ctx.lineTo(8, 4);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            });
+
+            // Mrkve od Drzého králíka
+            gameState.carrots.forEach(cr => {
+                ctx.save();
+                ctx.translate(cr.x, cr.y);
+                ctx.rotate(cr.rot);
+                ctx.fillStyle = '#f97316';
+                ctx.beginPath();
+                ctx.moveTo(-7, -3);
+                ctx.lineTo(8, 0);
+                ctx.lineTo(-7, 3);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = '#22c55e';
+                ctx.fillRect(-11, -2, 4, 4);
+                ctx.restore();
+            });
+
+            // Částice
+            gameState.particles.forEach(pt => {
+                ctx.globalAlpha = Math.max(0, pt.life / pt.maxLife);
+                ctx.fillStyle = pt.color;
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            });
+
+            // Plovoucí texty
+            ctx.font = 'bold 13px system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            gameState.floatingTexts.forEach(ft => {
+                ctx.globalAlpha = Math.min(1, ft.life);
+                ctx.fillStyle = '#0f172a';
+                ctx.fillText(ft.text, ft.x + 1, ft.y + 1);
+                ctx.fillStyle = ft.color;
+                ctx.fillText(ft.text, ft.x, ft.y);
+                ctx.globalAlpha = 1;
+            });
+
+            // Sněhové vločky v popředí
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+            gameState.snowflakes.forEach(sf => {
+                ctx.beginPath();
+                ctx.arc(sf.x, sf.y, sf.r, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        // --- VYKRESLENÍ JEDNOTLIVÝCH DRUHŮ TUČŇÁKŮ ---
+        function drawPenguin(p, time) {
+            ctx.save();
+            const hopOffset = p.hopTimer > 0 ? Math.sin((0.45 - p.hopTimer) / 0.45 * Math.PI) * 14 : 0;
+            const waddle = Math.sin(p.waddlePhase) * 0.08;
+            const isBaby = p.stage === 'baby';
+            const speciesScale = p.species === 'emperor' ? 1.24 : (p.species === 'rockhopper' ? 1.04 : 0.96);
+            const scale = (isBaby ? 0.68 : 1.0) * speciesScale;
+
+            ctx.translate(p.x, p.y - hopOffset);
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.22)';
+            ctx.beginPath();
+            ctx.ellipse(0, 14 * scale + hopOffset, 15 * scale, 6 * scale, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.save();
+            ctx.scale(scale * p.facing, scale);
+            ctx.rotate(waddle);
+
+            // Nožičky
+            ctx.fillStyle = p.species === 'rockhopper' ? '#fb7185' : '#f59e0b';
+            ctx.beginPath();
+            ctx.ellipse(-6, 13, 5, 3, 0, 0, Math.PI * 2);
+            ctx.ellipse(6, 13, 5, 3, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Tělo
+            const bodyColor = (p.species === 'emperor' && isBaby) ? '#64748b' : '#1e293b';
+            ctx.fillStyle = bodyColor;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 14, 18, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Bříško
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.ellipse(2, 2, 9.5, 13.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Zlatooranžová náprsenka dospělého císařského tučňáka
+            if (p.species === 'emperor' && !isBaby) {
+                const bibGrad = ctx.createLinearGradient(0, -10, 0, 4);
+                bibGrad.addColorStop(0, '#f59e0b');
+                bibGrad.addColorStop(1, '#fef08a');
+                ctx.fillStyle = bibGrad;
+                ctx.beginPath();
+                ctx.ellipse(3, -5, 8, 6.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Křídlo / ploutvička
+            const wingFlap = p.hopTimer > 0 ? -0.6 : 0.25 + Math.sin(p.waddlePhase) * 0.12;
+            ctx.fillStyle = bodyColor;
+            ctx.beginPath();
+            ctx.ellipse(-11, 1, 4, 11, wingFlap, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hlava
+            ctx.fillStyle = (p.species === 'emperor' && isBaby) ? '#1e293b' : bodyColor;
+            ctx.beginPath();
+            ctx.arc(1, -15, 10.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Bílá maska kolem očí u mláděte císařského tučňáka
+            if (p.species === 'emperor' && isBaby) {
+                ctx.fillStyle = '#f8fafc';
+                ctx.beginPath();
+                ctx.arc(3, -14, 7.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Oči a druhové znaky
+            if (p.isBlinking) {
+                ctx.strokeStyle = p.species === 'adelie' ? '#ffffff' : '#0f172a';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(3, -16);
+                ctx.lineTo(8, -16);
+                ctx.stroke();
+            } else if (p.species === 'adelie') {
+                // Výrazný bílý kroužek kolem očí
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(5, -16, 3.7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.arc(5.5, -16, 1.8, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (p.species === 'rockhopper') {
+                // Červené oči a dlouhé žlutooranžové chocholky peří
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(5, -16, 2.8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#000000';
+                ctx.beginPath();
+                ctx.arc(5.5, -16, 1.3, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(2, -20);
+                ctx.quadraticCurveTo(-5, -28, -12, -22);
+                ctx.moveTo(3, -19);
+                ctx.quadraticCurveTo(-3, -30, -10, -27);
+                ctx.stroke();
+            } else {
+                // Císařský tučňák
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.arc(5, -16, 2.1, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(5.6, -16.6, 0.8, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (!isBaby) {
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.beginPath();
+                    ctx.moveTo(-4, -24);
+                    ctx.lineTo(-2, -30);
+                    ctx.lineTo(1, -26);
+                    ctx.lineTo(4, -31);
+                    ctx.lineTo(7, -24);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+
+            // Zobák
+            ctx.fillStyle = p.species === 'rockhopper' ? '#f97316' : '#fbbf24';
+            ctx.beginPath();
+            ctx.moveTo(10, -16);
+            ctx.lineTo(17, -14);
+            ctx.lineTo(10, -12);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+
+            // Bublina potřeby
+            if (p.need) {
+                const bob = Math.sin(time * 5) * 3;
+                const by = -32 * scale - 10 + bob;
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(0, by, 13, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = p.need === 'hunger' ? '#0284c7' : (p.need === 'pet' ? '#e11d48' : '#d97706');
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.font = '14px system-ui, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const icon = p.need === 'hunger' ? '🐟' : (p.need === 'pet' ? '❤️' : '☀️');
+                ctx.fillText(icon, 0, by + 1);
+            }
+
+            ctx.restore();
+        }
+
+        // --- TUČŇÁK-SBĚRAČ ---
+        function drawCollectorAgent(agent) {
+            ctx.save();
+            const waddle = Math.sin(agent.waddlePhase) * 0.08;
+            ctx.translate(agent.x, agent.y);
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.22)';
+            ctx.beginPath();
+            ctx.ellipse(0, 12, 13, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.scale(agent.facing, 1);
+            ctx.rotate(waddle);
+
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 12, 15, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.ellipse(2, 2, 8, 11, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            const badgeColor = agent.coinType === 'diamond' ? '#38bdf8' : (agent.coinType === 'gold' ? '#fbbf24' : '#cbd5e1');
+            ctx.fillStyle = badgeColor;
+            ctx.beginPath();
+            ctx.arc(-4, 3, 5.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(1, -13, 9, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = badgeColor;
+            ctx.beginPath();
+            ctx.arc(1, -18, 7.5, Math.PI, 0);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(5, -14, 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.moveTo(9, -14);
+            ctx.lineTo(15, -12.5);
+            ctx.lineTo(9, -11);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // --- MALÝ KŘEČEK ---
+        function drawHamster(h, time) {
+            ctx.save();
+            const hop = h.flipTimer > 0 ? Math.sin((0.55 - h.flipTimer) / 0.55 * Math.PI) * 16 : Math.abs(Math.sin(h.runPhase)) * 2.5;
+            ctx.translate(h.x, h.y - hop);
+
+            ctx.fillStyle = 'rgba(244, 114, 182, 0.16)';
+            ctx.beginPath();
+            ctx.arc(0, 2, 22, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.24)';
+            ctx.beginPath();
+            ctx.ellipse(0, 8 + hop, 10, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (h.flipTimer > 0) ctx.rotate(h.flipAngle * h.facing);
+            ctx.scale(h.facing, 1);
+
+            ctx.fillStyle = '#f9a8d4';
+            const step = Math.sin(h.runPhase) * 2.5;
+            ctx.beginPath();
+            ctx.arc(-5 + step, 6, 2.3, 0, Math.PI * 2);
+            ctx.arc(5 - step, 6, 2.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#111827';
+            ctx.beginPath();
+            ctx.ellipse(0, 1, 10.5, 7.8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Barevná zimní šála
+            ctx.strokeStyle = '#ec4899';
+            ctx.lineWidth = 3.2;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(3, -5);
+            ctx.lineTo(4, 6);
+            ctx.moveTo(3, 1);
+            ctx.lineTo(-4, 4 + Math.sin(time * 8) * 1.5);
+            ctx.stroke();
+
+            ctx.fillStyle = '#111827';
+            ctx.beginPath();
+            ctx.arc(7, -2, 6.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#f472b6';
+            ctx.beginPath();
+            ctx.arc(4, -7.5, 2.2, 0, Math.PI * 2);
+            ctx.arc(13, -1.5, 1.7, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(8.5, -3.5, 1.7, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // --- DRZÝ KRÁLÍK ---
+        function drawRabbit(rb) {
+            ctx.save();
+            const hop = rb.flipTimer > 0
+                ? Math.sin((0.6 - rb.flipTimer) / 0.6 * Math.PI) * 20
+                : Math.abs(Math.sin(rb.hopPhase)) * 7;
+            ctx.translate(rb.x, rb.y - hop);
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.22)';
+            ctx.beginPath();
+            ctx.ellipse(0, 11 + hop, 11, 4.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (rb.flipTimer > 0) ctx.rotate(rb.flipAngle * rb.facing);
+            ctx.scale(rb.facing, 1);
+
+            // Chlupatý ocásek
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(-11, 3, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Tělo
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath();
+            ctx.ellipse(0, 2, 10, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hlava
+            ctx.beginPath();
+            ctx.arc(7, -4, 6.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Dlouhé králičí uši
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath();
+            ctx.ellipse(4, -15, 2.4, 7.5, -0.15, 0, Math.PI * 2);
+            ctx.ellipse(8, -15, 2.4, 7.5, 0.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#f472b6';
+            ctx.beginPath();
+            ctx.ellipse(4, -15, 1.1, 5, -0.15, 0, Math.PI * 2);
+            ctx.ellipse(8, -15, 1.1, 5, 0.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Drzý výraz a čumáček
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(9, -5, 1.6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fb7185';
+            ctx.beginPath();
+            ctx.arc(13, -3, 1.6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // --- HLÍDACÍ PES ---
+        function drawGuardDog(dog) {
+            ctx.save();
+            const runBounce = Math.abs(Math.sin(dog.runPhase)) * 3;
+            ctx.translate(dog.x, dog.y - runBounce);
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.24)';
+            ctx.beginPath();
+            ctx.ellipse(0, 12 + runBounce, 15, 5.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.scale(dog.facing, 1);
+
+            // Ocásek
+            ctx.strokeStyle = '#92400e';
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.moveTo(-13, 0);
+            ctx.quadraticCurveTo(-18, -8, -14, -12);
+            ctx.stroke();
+
+            // Huňaté tělíčko
+            ctx.fillStyle = '#b45309';
+            ctx.beginPath();
+            ctx.ellipse(0, 2, 14, 9, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Červený obojek
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(6, -5, 4, 11);
+
+            // Hlava a uši
+            ctx.fillStyle = '#92400e';
+            ctx.beginPath();
+            ctx.arc(11, -5, 7.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#451a03';
+            ctx.beginPath();
+            ctx.ellipse(8, -8, 3, 5.5, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Čumák a oko
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(18, -4, 2.2, 0, Math.PI * 2);
+            ctx.arc(13, -7, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // --- VEJCE, RYBA, MINCE, LOVEC, BUDOVY ---
+        function drawEgg(egg) {
+            ctx.save();
+            const rot = egg.wobble > 0 ? Math.sin(egg.wobble * 28) * 0.22 : 0;
+            ctx.translate(egg.x, egg.y);
+            ctx.rotate(rot);
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.2)';
+            ctx.beginPath();
+            ctx.ellipse(0, 11, 11, 4.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            let eggColor = '#f8fafc';
+            let spotColor = '#cbd5e1';
+            if (egg.species === 'rockhopper') { eggColor = '#fef3c7'; spotColor = '#f59e0b'; }
+            else if (egg.species === 'emperor') { eggColor = '#e0f2fe'; spotColor = '#38bdf8'; }
+
+            ctx.fillStyle = eggColor;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 10, 13, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = spotColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            const barW = 26;
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+            ctx.fillRect(-barW / 2, -21, barW, 5);
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillRect(-barW / 2 + 1, -20, (barW - 2) * Math.min(1, egg.warmth / 100), 3);
+
+            ctx.restore();
+        }
+
+        function drawFish(fish) {
+            ctx.save();
+            ctx.translate(fish.x, fish.y - fish.z);
+            ctx.fillStyle = '#0284c7';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 9, 4.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(-8, 0);
+            ctx.lineTo(-14, -4);
+            ctx.lineTo(-14, 4);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawDroppedCoin(coin, time) {
+            const conf = COIN_CONFIG[coin.type] || COIN_CONFIG.silver;
+            const pulse = 1 + Math.sin(time * 6 + coin.id) * 0.08;
+            ctx.save();
+            ctx.translate(coin.x, coin.y - coin.z);
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.25)';
+            ctx.beginPath();
+            ctx.ellipse(0, 7 + coin.z, 8, 3.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.scale(pulse, pulse);
+            ctx.fillStyle = conf.glow;
+            ctx.beginPath();
+            ctx.arc(0, 0, 11, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = conf.colorMain;
+            ctx.beginPath();
+            ctx.arc(0, 0, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = conf.colorDark;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = conf.colorRim;
+            ctx.beginPath();
+            ctx.arc(-2.5, -2.5, 2.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawHunter(h) {
+            ctx.save();
+            ctx.translate(h.x, h.y);
+
+            ctx.fillStyle = h.hitFlash > 0 ? '#ffffff' : '#7f1d1d';
+            ctx.beginPath();
+            ctx.moveTo(-24, 4);
+            ctx.lineTo(24, 4);
+            ctx.lineTo(17, 15);
+            ctx.lineTo(-17, 15);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#fca5a5';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(-6, -12, 12, 16);
+            ctx.fillStyle = '#fed7aa';
+            ctx.beginPath();
+            ctx.arc(0, -17, 5.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = h.stunTimer > 0 ? '#facc15' : '#dc2626';
+            ctx.fillRect(-6, -23, 12, 4);
+
+            const bw = 36;
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+            ctx.fillRect(-bw / 2, -32, bw, 6);
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(-bw / 2 + 1, -31, (bw - 2) * Math.max(0, h.hp / h.maxHp), 4);
+
+            ctx.restore();
+        }
+
+        function drawIncubator(x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(-14, -4, 28, 12);
+            ctx.fillStyle = 'rgba(125, 211, 252, 0.55)';
+            ctx.beginPath();
+            ctx.arc(0, -4, 13, Math.PI, 0);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawButterLauncher(x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = '#854d0e';
+            ctx.fillRect(-12, -4, 24, 12);
+            ctx.fillStyle = '#facc15';
+            ctx.fillRect(-8, -13, 16, 10);
+            ctx.restore();
+        }
+
+        function drawWalrus(x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = '#78350f';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 18, 13, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(-5, 3, 2.5, 9);
+            ctx.fillRect(3, 3, 2.5, 9);
+            ctx.restore();
+        }
+
+        function drawSnowCannon(x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = '#0369a1';
+            ctx.beginPath();
+            ctx.arc(0, 2, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#e0f2fe';
+            ctx.fillRect(-14, -6, 18, 7);
+            ctx.restore();
+        }
+
+        // =========================================================================
+        // 10. OVLÁDÁNÍ KLIKNUTÍM A DOTEKEM NA PLÁTNĚ
+        // =========================================================================
+        function handleCanvasPointer(clientX, clientY, isMoveOnly = false) {
+            const rect = canvas.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            // Sběr mincí přejetím nebo kliknutím
+            for (let i = gameState.droppedCoins.length - 1; i >= 0; i--) {
+                const c = gameState.droppedCoins[i];
+                if (Math.hypot(c.x - x, (c.y - c.z) - y) < 26) {
+                    collectCoin(c);
+                    if (isMoveOnly) return;
+                }
+            }
+
+            if (isMoveOnly) return;
+            sound.init();
+
+            // Kliknutí na lovce během nájezdu
+            if (gameState.hunters.length > 0) {
+                for (let i = 0; i < gameState.hunters.length; i++) {
+                    const h = gameState.hunters[i];
+                    if (Math.hypot(h.x - x, h.y - y) < 38) {
+                        throwSnowballAt(h.x, h.y, 1);
+                        return;
+                    }
+                }
+            }
+
+            // Kliknutí na vejce (zahřátí)
+            for (let i = 0; i < gameState.eggs.length; i++) {
+                const egg = gameState.eggs[i];
+                if (Math.hypot(egg.x - x, egg.y - y) < 26) {
+                    egg.warmth = Math.min(100, egg.warmth + 22);
+                    egg.wobble = 0.5;
+                    sound.playHappy();
+                    spawnParticles(egg.x, egg.y - 8, '#fbbf24', 7);
+                    addFloatingText(egg.x, egg.y - 22, '☀️ +22%', '#fde047');
+                    if (egg.warmth >= 100) hatchEgg(egg);
+                    return;
+                }
+            }
+
+            // Kliknutí na tučňáka (mazlení / zahřátí)
+            for (let i = 0; i < gameState.penguins.length; i++) {
+                const p = gameState.penguins[i];
+                if (Math.hypot(p.x - x, p.y - y) < 28) {
+                    if (p.need === 'pet' || p.need === 'warm') {
+                        satisfyPenguinNeed(p, 3);
+                    } else if (p.need === 'hunger') {
+                        throwFishAt(p.x, p.y + 8);
+                    } else {
+                        p.hopTimer = 0.35;
+                        sound.playHappy();
+                        spawnParticles(p.x, p.y - 12, '#f472b6', 5);
+                    }
+                    return;
+                }
+            }
+
+            // Kliknutí na ledovou kru -> hodí rybu
+            const { cx, cy, rx, ry } = getIceGeometry();
+            const normDist = Math.pow((x - cx) / rx, 2) + Math.pow((y - cy) / ry, 2);
+            if (normDist <= 1.05) {
+                throwFishAt(x, y);
+            } else if (gameState.hunters.length > 0) {
+                throwSnowballAt(x, y, 1);
+            }
+        }
+
+        canvas.addEventListener('pointerdown', e => handleCanvasPointer(e.clientX, e.clientY, false));
+        canvas.addEventListener('pointermove', e => handleCanvasPointer(e.clientX, e.clientY, true));
+
+        // =========================================================================
+        // 11. OBCHOD, NÁKUPY A TEXTOVÉ OZNAČENÍ POSLEDNÍHO VYLEPŠENÍ
+        // =========================================================================
+        function setShopTab(tab) {
+            currentShopTab = tab;
+            document.querySelectorAll('.shop-tab').forEach(el => el.classList.remove('active'));
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            if (activeBtn) activeBtn.classList.add('active');
+            renderShop();
+        }
+
+        function getShopItems() {
+            const sVal = getEffectiveCoinValue('silver');
+            const gVal = getEffectiveCoinValue('gold');
+            const dVal = getEffectiveCoinValue('diamond');
+
+            if (currentShopTab === 'penguins') {
+                return [
+                    {
+                        icon: '🥚',
+                        title: 'Běžné vejce (kroužkový)',
+                        desc: `Bílý kroužek kolem očí. Po vylíhnutí shazuje stříbrné mince (${sVal} 🪙).`,
+                        price: SPECIES_CONFIG.adelie.eggPrice,
+                        action: () => buyEgg('adelie', SPECIES_CONFIG.adelie.eggPrice)
+                    },
+                    {
+                        icon: '🐧',
+                        title: 'Mládě tučňáka kroužkového',
+                        desc: `Okamžitý přírůstek do rezervace. Shazuje stříbrné mince (${sVal} 🪙).`,
+                        price: SPECIES_CONFIG.adelie.babyPrice,
+                        action: () => buyBaby('adelie', SPECIES_CONFIG.adelie.babyPrice)
+                    },
+                    {
+                        icon: '🟡',
+                        title: 'Arktické vejce (skalní)',
+                        desc: `Červené oči a žluté chocholky. Shazuje zlaté mince (${gVal} 🪙).`,
+                        price: SPECIES_CONFIG.rockhopper.eggPrice,
+                        action: () => buyEgg('rockhopper', SPECIES_CONFIG.rockhopper.eggPrice)
+                    },
+                    {
+                        icon: '🐧',
+                        title: 'Mládě tučňáka skalního',
+                        desc: `Čiperný skokan se zlatými mincemi (${gVal} 🪙).`,
+                        price: SPECIES_CONFIG.rockhopper.babyPrice,
+                        action: () => buyBaby('rockhopper', SPECIES_CONFIG.rockhopper.babyPrice)
+                    },
+                    {
+                        icon: '👑',
+                        title: 'Císařské vejce (císařský)',
+                        desc: `Zlatá náprsenka a korunka. Shazuje diamantové mince (${dVal} 🪙).`,
+                        price: SPECIES_CONFIG.emperor.eggPrice,
+                        action: () => buyEgg('emperor', SPECIES_CONFIG.emperor.eggPrice)
+                    },
+                    {
+                        icon: '👑',
+                        title: 'Mládě tučňáka císařského',
+                        desc: `Stříbrošedé mládě s bílou maskou. Diamantové mince (${dVal} 🪙).`,
+                        price: SPECIES_CONFIG.emperor.babyPrice,
+                        action: () => buyBaby('emperor', SPECIES_CONFIG.emperor.babyPrice)
+                    }
+                ];
+            }
+
+            if (currentShopTab === 'collectors') {
+                return [
+                    {
+                        icon: '🥈',
+                        level: gameState.collectors.silver,
+                        maxLevel: 3,
+                        title: 'Sběrač stříbrných mincí',
+                        desc: gameState.collectors.silver >= 3
+                            ? '✓ Sběrač stříbrných mincí dosáhl posledního vylepšení (maximální rychlost).'
+                            : 'Tučňák se stříbrnou čepičkou a brašnou. Vyšší úroveň zrychluje běh.',
+                        price: 65 + gameState.collectors.silver * 55,
+                        action: () => buyCollector('silver', 'Sběrač stříbrných mincí')
+                    },
+                    {
+                        icon: '🥇',
+                        level: gameState.collectors.gold,
+                        maxLevel: 3,
+                        title: 'Sběrač zlatých mincí',
+                        desc: gameState.collectors.gold >= 3
+                            ? '✓ Sběrač zlatých mincí dosáhl posledního vylepšení (maximální rychlost).'
+                            : 'Tučňák se zlatou čepičkou a brašnou. Vyšší úroveň zrychluje běh.',
+                        price: 150 + gameState.collectors.gold * 120,
+                        action: () => buyCollector('gold', 'Sběrač zlatých mincí')
+                    },
+                    {
+                        icon: '💎',
+                        level: gameState.collectors.diamond,
+                        maxLevel: 3,
+                        title: 'Sběrač diamantových mincí',
+                        desc: gameState.collectors.diamond >= 3
+                            ? '✓ Sběrač diamantových mincí dosáhl posledního vylepšení (maximální rychlost).'
+                            : 'Tučňák s tyrkysovou čepičkou a brašnou. Vyšší úroveň zrychluje běh.',
+                        price: 320 + gameState.collectors.diamond * 240,
+                        action: () => buyCollector('diamond', 'Sběrač diamantových mincí')
+                    }
+                ];
+            }
+
+            if (currentShopTab === 'care') {
+                const expLvl = gameState.upgrades.islandExpansion + 1;
+                return [
+                    {
+                        icon: '🐹',
+                        level: gameState.upgrades.hamsterLevel,
+                        maxLevel: 3,
+                        title: 'Malý křeček',
+                        desc: gameState.upgrades.hamsterLevel >= 3
+                            ? '✓ Malý křeček dosáhl posledního vylepšení (maximální rychlost a dosah nálady).'
+                            : 'Malý černý křeček v šále běhá za tučňáky, dělá kotrmelce, plní mazlení (❤️) a zvedá náladu.',
+                        price: 75 + gameState.upgrades.hamsterLevel * 85,
+                        action: () => buyUpgrade('hamsterLevel', 75 + gameState.upgrades.hamsterLevel * 85, '🐹 Malý křeček je na kře!', 3, 'Malý křeček')
+                    },
+                    {
+                        icon: '🐰',
+                        level: gameState.upgrades.rabbitLevel,
+                        maxLevel: 3,
+                        title: 'Drzý králík',
+                        desc: gameState.upgrades.rabbitLevel >= 3
+                            ? '✓ Drzý králík dosáhl posledního vylepšení (maximální morálka i kadence mrkví).'
+                            : 'Skáče po kře, dělá přemety, zvyšuje Morálku % kolonie (vyšší výnos z mincí) a hází po lovcích mrkve!',
+                        price: 130 + gameState.upgrades.rabbitLevel * 120,
+                        action: () => buyUpgrade('rabbitLevel', 130 + gameState.upgrades.rabbitLevel * 120, '🐰 Drzý králík zvedá morálku kolonie!', 3, 'Drzý králík')
+                    },
+                    {
+                        icon: '🧊',
+                        level: expLvl,
+                        maxLevel: 4,
+                        isMaxedOverride: gameState.upgrades.islandExpansion >= 3,
+                        title: 'Rozšíření ledové kry',
+                        desc: gameState.upgrades.islandExpansion >= 3
+                            ? '✓ Ledová kra dosáhla posledního vylepšení – maximální velikosti i kapacity (22 tučňáků).'
+                            : `Zvětší oválnou ledovou kru a navýší kapacitu tučňáků (${ICE_CAPACITIES[gameState.upgrades.islandExpansion]} → ${ICE_CAPACITIES[Math.min(3, gameState.upgrades.islandExpansion + 1)]}).`,
+                        price: 110 + gameState.upgrades.islandExpansion * 95,
+                        action: () => buyIslandExpansion()
+                    },
+                    {
+                        icon: '🌡️',
+                        level: gameState.upgrades.incubatorLevel,
+                        maxLevel: 3,
+                        title: 'Vyhřívaný inkubátor',
+                        desc: gameState.upgrades.incubatorLevel >= 3
+                            ? '✓ Vyhřívaný inkubátor dosáhl posledního vylepšení.'
+                            : 'Automaticky zahřívá všechna vejce na ledové kře až do vylíhnutí.',
+                        price: 90 + gameState.upgrades.incubatorLevel * 90,
+                        action: () => buyUpgrade('incubatorLevel', 90 + gameState.upgrades.incubatorLevel * 90, '🌡️ Vyhřívaný inkubátor vylepšen!', 3, 'Vyhřívaný inkubátor')
+                    },
+                    {
+                        icon: '🐟',
+                        level: gameState.upgrades.fishQuality,
+                        maxLevel: 3,
+                        title: 'Kvalitnější ryby',
+                        desc: gameState.upgrades.fishQuality >= 3
+                            ? '✓ Kvalitnější ryby dosáhly posledního vylepšení.'
+                            : 'Ryby lépe zasytí mláďata, zrychlí jejich růst a přidají více morálky.',
+                        price: 65 + gameState.upgrades.fishQuality * 75,
+                        action: () => buyUpgrade('fishQuality', 65 + gameState.upgrades.fishQuality * 75, '🐟 Kvalitnější ryby vylepšeny!', 3, 'Kvalitnější ryby')
+                    }
+                ];
+            }
+
+            return [
+                {
+                    icon: '🐕',
+                    level: gameState.upgrades.guardDogLevel,
+                    maxLevel: 3,
+                    title: 'Hlídací pes',
+                    desc: gameState.upgrades.guardDogLevel >= 3
+                        ? '✓ Hlídací pes dosáhl posledního vylepšení.'
+                        : 'Huňatý arktický pes hlídá okraj kry; při poplachu vyrazí k lovcům, kouše je a zpomaluje.',
+                    price: 100 + gameState.upgrades.guardDogLevel * 95,
+                    action: () => buyUpgrade('guardDogLevel', 100 + gameState.upgrades.guardDogLevel * 95, '🐕 Hlídací pes nastoupil na stráž!', 3, 'Hlídací pes')
+                },
+                {
+                    icon: '🚀',
+                    level: gameState.upgrades.butterRockets,
+                    maxLevel: 3,
+                    title: 'Máslové rakety',
+                    desc: gameState.upgrades.butterRockets >= 3
+                        ? '✓ Máslové rakety dosáhly posledního vylepšení.'
+                        : 'Automatická odpalovací rampa vystřeluje máslové rakety, které lovce poškodí a omráčí na kluzkém másle.',
+                    price: 180 + gameState.upgrades.butterRockets * 150,
+                    action: () => buyUpgrade('butterRockets', 180 + gameState.upgrades.butterRockets * 150, '🚀 Máslové rakety připraveny k palbě!', 3, 'Máslové rakety')
+                },
+                {
+                    icon: '🎯',
+                    level: gameState.upgrades.snowCannon,
+                    maxLevel: 3,
+                    title: 'Automatické sněžné dělo',
+                    desc: gameState.upgrades.snowCannon >= 3
+                        ? '✓ Automatické sněžné dělo dosáhlo posledního vylepšení.'
+                        : 'Automaticky střílí silné sněhové koule na připlouvající lovce.',
+                    price: 140 + gameState.upgrades.snowCannon * 120,
+                    action: () => buyUpgrade('snowCannon', 140 + gameState.upgrades.snowCannon * 120, '🎯 Sněžné dělo vylepšeno!', 3, 'Automatické sněžné dělo')
+                },
+                {
+                    icon: '🦭',
+                    level: gameState.upgrades.walrusGuard,
+                    maxLevel: 3,
+                    title: 'Strážný mrož Barnabáš',
+                    desc: gameState.upgrades.walrusGuard >= 3
+                        ? '✓ Strážný mrož Barnabáš dosáhl posledního vylepšení.'
+                        : 'Mohutný mrož odrážející lovce na pobřeží ledové kry.',
+                    price: 120 + gameState.upgrades.walrusGuard * 105,
+                    action: () => buyUpgrade('walrusGuard', 120 + gameState.upgrades.walrusGuard * 105, '🦭 Strážný mrož Barnabáš brání pobřeží!', 3, 'Strážný mrož Barnabáš')
+                }
+            ];
+        }
+
+        function buyEgg(species, price) {
+            if (gameState.coins < price) { showToast('❌ Nemáš dostatek mincí!'); return; }
+            if (gameState.penguins.length + gameState.eggs.length >= gameState.maxPenguins) {
+                showToast('⚠️ Kapacita ledové kry je plná! Rozšiř kru v záložce Péče & Morálka.');
+                return;
+            }
+            gameState.coins -= price;
+            gameState.eggs.push(createEgg(species));
+            sound.playBuy();
+            showToast(`🥚 Koupil jsi ${SPECIES_CONFIG[species].name.toLowerCase()} (vejce)!`);
+            renderShop();
+            updateUI();
+        }
+
+        function buyBaby(species, price) {
+            if (gameState.coins < price) { showToast('❌ Nemáš dostatek mincí!'); return; }
+            if (gameState.penguins.length >= gameState.maxPenguins) {
+                showToast('⚠️ Kapacita ledové kry je plná! Rozšiř kru v záložce Péče & Morálka.');
+                return;
+            }
+            gameState.coins -= price;
+            const baby = createPenguin(species, 'baby');
+            baby.need = 'hunger';
+            gameState.penguins.push(baby);
+            sound.playBuy();
+            showToast(`🐧 Nové mládě (${baby.name}) dorazilo na kru!`);
+            renderShop();
+            updateUI();
+        }
+
+        function buyCollector(coinType, label) {
+            const current = gameState.collectors[coinType] || 0;
+            if (current >= 3) {
+                showToast(`✓ ${label} dosáhl posledního vylepšení!`);
+                return;
+            }
+            const base = coinType === 'silver' ? 65 : (coinType === 'gold' ? 150 : 320);
+            const step = coinType === 'silver' ? 55 : (coinType === 'gold' ? 120 : 240);
+            const price = base + current * step;
+
+            if (gameState.coins < price) { showToast('❌ Nemáš dostatek mincí!'); return; }
+            gameState.coins -= price;
+            gameState.collectors[coinType] = current + 1;
+            syncAllCompanions();
+            sound.playBuy();
+
+            if (gameState.collectors[coinType] >= 3) {
+                showToast(`✓ ${label} dosáhl posledního vylepšení!`);
+            } else {
+                showToast(`🎒 ${label} vylepšen na Úroveň ${gameState.collectors[coinType]} / 3!`);
+            }
+            renderShop();
+            updateUI();
+        }
+
+        function buyUpgrade(key, price, msg, maxLevel, label) {
+            const current = gameState.upgrades[key] || 0;
+            if (current >= maxLevel) {
+                showToast(`✓ ${label} dosáhl posledního vylepšení!`);
+                return;
+            }
+            if (gameState.coins < price) { showToast('❌ Nemáš dostatek mincí!'); return; }
+            gameState.coins -= price;
+            gameState.upgrades[key] = current + 1;
+            syncAllCompanions();
+            sound.playBuy();
+
+            if (gameState.upgrades[key] >= maxLevel) {
+                showToast(`✓ ${label} dosáhl posledního vylepšení!`);
+            } else {
+                showToast(msg);
+            }
+            renderShop();
+            updateUI();
+        }
+
+        function buyIslandExpansion() {
+            const maxExp = 3; // Úroveň 1/4 až 4/4
+            if (gameState.upgrades.islandExpansion >= maxExp) {
+                showToast('✓ Ledová kra dosáhla posledního vylepšení – maximální velikosti i kapacity!');
+                return;
+            }
+            const price = 110 + gameState.upgrades.islandExpansion * 95;
+            if (gameState.coins < price) { showToast('❌ Nemáš dostatek mincí!'); return; }
+            gameState.coins -= price;
+            gameState.upgrades.islandExpansion++;
+            gameState.maxPenguins = ICE_CAPACITIES[gameState.upgrades.islandExpansion] || 22;
+            sound.playBuy();
+
+            const { cx, cy } = getIceGeometry();
+            if (gameState.upgrades.islandExpansion >= maxExp) {
+                showToast('🧊✨ Ledová kra dosáhla posledního vylepšení – maximální velikosti i kapacity!');
+                addFloatingText(cx, cy - 35, '🧊 Poslední vylepšení kry!', '#7dd3fc');
+                spawnParticles(cx, cy, '#7dd3fc', 24);
+            } else {
+                showToast(`🧊 Ledová kra rozšířena (Úroveň ${gameState.upgrades.islandExpansion + 1} / 4)! Kapacita: ${gameState.maxPenguins}.`);
+            }
+            renderShop();
+            updateUI();
+        }
+
+        function renderShop() {
+            const container = document.getElementById('shop-items-container');
+            if (!container) return;
+            const items = getShopItems();
+            container.innerHTML = '';
+
+            items.forEach(item => {
+                const hasLevels = typeof item.level === 'number' && typeof item.maxLevel === 'number';
+                const isMaxed = hasLevels && (item.isMaxedOverride === true || item.level >= item.maxLevel);
+                const canAfford = !isMaxed && gameState.coins >= item.price;
+
+                const levelBadge = hasLevels
+                    ? `<span class="badge-lvl ${isMaxed ? 'max' : ''}">${
+                        isMaxed ? '✓ Poslední vylepšení' : `Úroveň ${item.level} / ${item.maxLevel}`
+                    }</span>`
+                    : '';
+
+                const card = document.createElement('div');
+                card.className = `shop-card ${isMaxed ? 'maxed' : ''}`;
+
+                card.innerHTML = `
+                    <div class="shop-card-left">
+                        <div class="item-icon">${item.icon}</div>
+                        <div class="item-info">
+                            <div class="item-header">
+                                <h3 class="item-title">${item.title}</h3>
+                                ${levelBadge}
+                            </div>
+                            <p class="item-desc">${item.desc}</p>
+                        </div>
+                    </div>
+                    <button class="btn-buy ${isMaxed ? 'maxed-btn' : ''}" ${isMaxed || !canAfford ? 'disabled' : ''}>
+                        ${isMaxed ? '✓ Poslední vylepšení' : `${item.price} 🪙`}
+                    </button>
+                `;
+
+                const btn = card.querySelector('button');
+                if (btn && !isMaxed) btn.addEventListener('click', item.action);
+                container.appendChild(card);
+            });
+        }
+
+        function updateUI() {
+            const coinsEl = document.getElementById('ui-coins');
+            const pengEl = document.getElementById('ui-penguins');
+            const maxPengEl = document.getElementById('ui-max-penguins');
+            const moraleEl = document.getElementById('ui-morale');
+            const ng2El = document.getElementById('ui-ng2-progress');
+            const raidEl = document.getElementById('ui-raid-timer');
+            const modeBadge = document.getElementById('ui-mode-badge');
+            const modeBtn = document.getElementById('btn-modes');
+
+            if (coinsEl) coinsEl.textContent = Math.floor(gameState.coins);
+            if (pengEl) pengEl.textContent = gameState.penguins.length;
+            if (maxPengEl) maxPengEl.textContent = gameState.maxPenguins;
+            if (moraleEl) moraleEl.textContent = `${Math.round(gameState.morale)}%`;
+
+            const unlocked = globalTotalCoins >= NG2_UNLOCK_COINS;
+            if (ng2El) {
+                ng2El.textContent = unlocked
+                    ? '⚡ Odemčeno!'
+                    : `${globalTotalCoins.toLocaleString('cs-CZ')} / 10 000`;
+            }
+
+            if (modeBadge) {
+                if (gameState.gameMode === 2) {
+                    modeBadge.textContent = '⚡ NG2 TURBO 2.2×';
+                    modeBadge.classList.add('ng2');
+                } else {
+                    modeBadge.textContent = 'NG1';
+                    modeBadge.classList.remove('ng2');
+                }
+            }
+
+            if (modeBtn && unlocked) {
+                modeBtn.classList.add('unlocked');
+            }
+
+            if (raidEl) {
+                if (gameState.raidActive) {
+                    raidEl.textContent = `NÁJEZD (${gameState.hunters.length})`;
+                } else {
+                    raidEl.textContent = `${Math.ceil(gameState.raidTimer)}s`;
+                }
+            }
+
+            // Aktualizace legendy hodnot mincí v dolní liště
+            const legS = document.getElementById('leg-silver');
+            const legG = document.getElementById('leg-gold');
+            const legD = document.getElementById('leg-diamond');
+            if (legS) legS.textContent = `${getEffectiveCoinValue('silver')} 🪙`;
+            if (legG) legG.textContent = `${getEffectiveCoinValue('gold')} 🪙`;
+            if (legD) legD.textContent = `${getEffectiveCoinValue('diamond')} 🪙`;
+        }
+
+        // --- MODÁL PRO NEW GAME 1 / NEW GAME 2 / RESET ---
+        function openModeModal() {
+            const modal = document.getElementById('mode-modal');
+            const pct = Math.min(100, (globalTotalCoins / NG2_UNLOCK_COINS) * 100);
+            const bar = document.getElementById('modal-ng2-bar');
+            const txt = document.getElementById('modal-ng2-text');
+            const btnNg2 = document.getElementById('btn-start-ng2');
+            const badgeNg2 = document.getElementById('badge-start-ng2');
+
+            if (bar) bar.style.width = `${pct}%`;
+            if (txt) txt.textContent = `${globalTotalCoins.toLocaleString('cs-CZ')} / 10 000 🪙`;
+
+            const unlocked = globalTotalCoins >= NG2_UNLOCK_COINS;
+            if (btnNg2) btnNg2.disabled = !unlocked;
+            if (badgeNg2) {
+                badgeNg2.textContent = unlocked ? '⚡ Spustit →' : '🔒 Zamčeno';
+            }
+
+            if (modal) modal.classList.add('open');
+        }
+
+        function closeModeModal() {
+            const modal = document.getElementById('mode-modal');
+            if (modal) modal.classList.remove('open');
+        }
+
+        function startSelectedMode(mode) {
+            if (mode === 2 && globalTotalCoins < NG2_UNLOCK_COINS) {
+                showToast('🔒 Pro odemčení New Game 2 musíš nasbírat celkem 10 000 mincí!');
+                return;
+            }
+            closeModeModal();
+            initNewGame(mode);
+            saveGame(false);
+            if (mode === 2) {
+                sound.playHatch();
+                showToast('⚡ NEW GAME 2 (Turbo 2.2× + 50 % hodnota mincí) spuštěna!');
+            } else {
+                sound.playBuy();
+                showToast('🐧 New Game 1 spuštěna! Máš 2 tučňáky, 1 vejce a 40 mincí.');
+            }
+        }
+
+        // =========================================================================
+        // 12. SPUŠTĚNÍ APLIKACE
+        // =========================================================================
+        let lastTimestamp = 0;
+        let autoSaveTimer = 0;
+        let uiRefreshTimer = 0;
+
+        function mainLoop(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const rawDt = Math.min(0.05, Math.max(0.001, (timestamp - lastTimestamp) / 1000));
+            lastTimestamp = timestamp;
+
+            updateGame(rawDt);
+            drawScene(timestamp / 1000);
+
+            uiRefreshTimer += rawDt;
+            if (uiRefreshTimer >= 0.25) {
+                uiRefreshTimer = 0;
+                updateUI();
+            }
+
+            autoSaveTimer += rawDt;
+            if (autoSaveTimer >= 12) {
+                autoSaveTimer = 0;
+                saveGame(false);
+            }
+
+            requestAnimationFrame(mainLoop);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            gameState.penguins.forEach(p => {
+                const clamped = clampToIce(p.x, p.y, 22);
+                p.x = clamped.x;
+                p.y = clamped.y;
+            });
+            gameState.eggs.forEach(e => {
+                const clamped = clampToIce(e.x, e.y, 26);
+                e.x = clamped.x;
+                e.y = clamped.y;
+            });
+        });
+
+        window.onload = function () {
+            resizeCanvas();
+            const restored = loadGame();
+            if (!restored) {
+                initNewGame(1);
+            } else {
+                renderShop();
+                updateUI();
+            }
+            requestAnimationFrame(mainLoop);
+        };
+    </script>
+</body>
+</html>
